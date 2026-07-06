@@ -1183,7 +1183,7 @@
                         </svg>
                         <span>Dashboard</span>
                     </a></li>
-                <li><a href="#" class="active">
+                <li><a href="admin_clientes.html" class="active">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -1193,7 +1193,7 @@
                         </svg>
                         <span>Clientes</span>
                     </a></li>
-                <li><a href="#">
+                <li><a href="admin_docs.html">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -1203,7 +1203,7 @@
                         </svg>
                         <span>Documentos</span>
                     </a></li>
-                <li><a href="#">
+                <li><a href="admin_link.html">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -1228,8 +1228,18 @@
             <div class="page-header">
                 <div>
                     <h1 class="page-title">Clientes</h1>
-                    <p class="page-subtitle" id="headerSubtitle">128 clientes cadastrados</p>
+
+                    <!-- Consumir o registro com base nos dados da planilha -->
+                    <p class="page-subtitle" id="headerSubtitle">-- clientes cadastrados</p>
                 </div>
+                <button class="btn-primary" onclick="openNewClientModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Novo Cliente
+                </button>
             </div>
 
             <!-- Filtros -->
@@ -1251,8 +1261,13 @@
                 </select>
                 <select class="filter-select" id="destinoFilter" onchange="applyFilters()">
                     <option value="">Todos os destinos</option>
-                    <!-- Preenher com os destinos dentro do formulário -->
-                    <option value="IDS Cologne 2026">-</option>
+                    <option value="IDS Cologne 2026">IDS Cologne 2026</option>
+                    <option value="Fitur Madrid 2026">Fitur Madrid 2026</option>
+                    <option value="ABAV Expo 2026">ABAV Expo 2026</option>
+                    <option value="WTM London 2026">WTM London 2026</option>
+                    <option value="IMEX Frankfurt 2026">IMEX Frankfurt 2026</option>
+                    <option value="ITB Berlin 2026">ITB Berlin 2026</option>
+                    <option value="Arabian Travel Market 2026">Arabian Travel Market 2026</option>
                 </select>
                 <span class="filters-count" id="filtersCount"></span>
             </div>
@@ -1395,9 +1410,13 @@
                             <label>Destino / Evento</label>
                             <select id="edit-destino">
                                 <option value="">Selecione…</option>
-
-                                <!-- Preencher com a aba de destinos do formuláro -->
-                                <option>-</option>
+                                <option>IDS Cologne 2026</option>
+                                <option>Fitur Madrid 2026</option>
+                                <option>ABAV Expo 2026</option>
+                                <option>WTM London 2026</option>
+                                <option>IMEX Frankfurt 2026</option>
+                                <option>ITB Berlin 2026</option>
+                                <option>Arabian Travel Market 2026</option>
                             </select>
                         </div>
                         <div class="field">
@@ -1435,6 +1454,43 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        /* ══════════════════════════════════
+           DADOS MOCK
+        ══════════════════════════════════ */
+        const AVATAR_COLORS = ['#173B64', '#1E4E82', '#2A6AAD', '#166534', '#9A3412', '#5B21B6', '#0F766E'];
+
+        const clientes = [
+            { id: 1, nome: 'João Silva', email: 'joao.silva@email.com', telefone: '+55 92 9 8811-2233', destino: 'IDS Cologne 2026', status: 'Ativo', cadastro: '2026-01-15', obs: 'VIP — prefere comunicação por WhatsApp.', link: 'https://tw.joy/joao-silva' },
+            { id: 2, nome: 'Maria Costa', email: 'maria.costa@empresa.com', telefone: '+55 11 9 9922-3344', destino: 'Fitur Madrid 2026', status: 'Ativo', cadastro: '2026-01-22', obs: '', link: 'https://tw.joy/maria-costa' },
+            { id: 3, nome: 'Pedro Souza', email: 'pedro.souza@outlook.com', telefone: '+55 21 9 8733-4455', destino: 'ABAV Expo 2026', status: 'Pendente', cadastro: '2026-02-03', obs: 'Aguardando confirmação de pagamento.', link: 'https://tw.joy/pedro-souza' },
+            { id: 4, nome: 'Ana Lima', email: 'ana.lima@gmail.com', telefone: '+55 31 9 9644-5566', destino: 'WTM London 2026', status: 'Ativo', cadastro: '2026-02-14', obs: '', link: 'https://tw.joy/ana-lima' },
+            { id: 5, nome: 'Carlos Pereira', email: 'c.pereira@corp.com', telefone: '+55 51 9 9555-6677', destino: 'IMEX Frankfurt 2026', status: 'Ativo', cadastro: '2026-02-28', obs: 'Grupo de 4 pessoas.', link: 'https://tw.joy/carlos-pereira' },
+            { id: 6, nome: 'Beatriz Mendes', email: 'bia.mendes@email.com', telefone: '+55 85 9 8466-7788', destino: 'ITB Berlin 2026', status: 'Ativo', cadastro: '2026-03-05', obs: '', link: 'https://tw.joy/beatriz-mendes' },
+            { id: 7, nome: 'Rafael Torres', email: 'rafael.t@empresa.com', telefone: '+55 62 9 9377-8899', destino: 'Arabian Travel Market 2026', status: 'Pendente', cadastro: '2026-03-10', obs: 'Solicitou seguro viagem adicional.', link: 'https://tw.joy/rafael-torres' },
+            { id: 8, nome: 'Fernanda Rocha', email: 'fernanda.r@gmail.com', telefone: '+55 71 9 8288-9900', destino: 'ABAV Expo 2026', status: 'Inativo', cadastro: '2026-01-08', obs: 'Cancelou — remarcação prevista para Q3.', link: 'https://tw.joy/fernanda-rocha' },
+            { id: 9, nome: 'Lucas Almeida', email: 'lucas.a@outlook.com', telefone: '+55 48 9 9199-0011', destino: 'Fitur Madrid 2026', status: 'Ativo', cadastro: '2026-03-18', obs: '', link: 'https://tw.joy/lucas-almeida' },
+            { id: 10, nome: 'Camila Nunes', email: 'camila.n@corp.com', telefone: '+55 16 9 8000-1122', destino: 'WTM London 2026', status: 'Ativo', cadastro: '2026-03-25', obs: 'Executiva, precisa de sala VIP no aeroporto.', link: 'https://tw.joy/camila-nunes' },
+            { id: 11, nome: 'Diego Carvalho', email: 'diego.c@email.com', telefone: '+55 27 9 7911-2233', destino: 'IDS Cologne 2026', status: 'Ativo', cadastro: '2026-04-01', obs: '', link: 'https://tw.joy/diego-carvalho' },
+            { id: 12, nome: 'Isabela Martins', email: 'isa.martins@gmail.com', telefone: '+55 91 9 9822-3344', destino: 'ITB Berlin 2026', status: 'Pendente', cadastro: '2026-04-09', obs: 'Aguarda visto.', link: 'https://tw.joy/isabela-martins' },
+        ];
+
+        const historicos = {
+            1: [
+                { tipo: 'green', texto: 'Link personalizado gerado e enviado por e-mail.', data: '22 jun 2026, 14:32' },
+                { tipo: 'green', texto: 'Cliente confirmou recebimento do roteiro.', data: '20 jun 2026, 10:15' },
+                { tipo: '', texto: 'Primeiro contato via WhatsApp.', data: '15 jan 2026, 09:00' },
+            ],
+            2: [
+                { tipo: 'green', texto: 'Status alterado para Ativo.', data: '22 jan 2026, 11:00' },
+                { tipo: '', texto: 'Cadastro criado.', data: '22 jan 2026, 10:50' },
+            ],
+            3: [
+                { tipo: 'orange', texto: 'Pagamento pendente — segundo aviso enviado.', data: '18 jun 2026, 16:00' },
+                { tipo: 'orange', texto: 'Status alterado para Pendente.', data: '10 jun 2026, 09:30' },
+                { tipo: '', texto: 'Cadastro criado.', data: '03 fev 2026, 14:00' },
+            ],
+        };
+
         /* ══════════════════════════════════
            ESTADO
         ══════════════════════════════════ */
