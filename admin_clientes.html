@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <title>Clientes — TravelWallet</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --navy: #173B64;
+            --navy-mid: #1E4E82;
+            --navy-light: #2A6AAD;
+            --powder: #A3C4EB;
+            --powder-dim: rgba(163, 196, 235, 0.18);
+            --alice: #F6FAFF;
+            --yellow: #FFDE70;
+            --yellow-hover: #F5D04A;
+            --yellow-glow: rgba(255, 222, 112, 0.35);
+            --white: #FFFFFF;
+            --gray-50: #F0F6FF;
+            --gray-100: #DDE9F5;
+            --gray-300: #8AABC8;
+            --gray-500: #4A6A8A;
+            --surface: var(--white);
+            --border: var(--gray-100);
+            --border-focus: var(--powder);
+            --radius-xs: 8px;
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 30px;
+            --shadow-card: 0 8px 40px rgba(23, 59, 100, 0.13);
+            --shadow-button: 0 6px 22px var(--yellow-glow);
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            color-scheme: light;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            color: var(--navy);
+            background: var(--gray-50);
+        }
+
+        /* ══════════ LAYOUT ══════════ */
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ══════════ SIDEBAR ══════════ */
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--navy);
+            background-image:
+                radial-gradient(ellipse 80% 40% at 50% 0%, rgba(163, 196, 235, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 30% at 50% 100%, rgba(255, 222, 112, 0.06) 0%, transparent 55%);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 28px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 28px 22px 24px;
+            border-bottom: 1.5px solid rgba(163, 196, 235, 0.12);
+            margin-bottom: 8px;
+        }
+
+        .sidebar-brand .brand-icon {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-brand .brand-icon .icon-wrap {
+            width: 32px;
+            height: 32px;
+            background: var(--yellow);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand .brand-icon .icon-wrap svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .sidebar-brand .brand-name {
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.01em;
+            line-height: 1.1;
+        }
+
+        .sidebar-brand .brand-sub {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--powder);
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-top: 2px;
+            padding-left: 42px;
+        }
+
+        .nav {
+            list-style: none;
+            padding: 0 12px;
+            flex: 1;
+        }
+
+        .nav li {
+            margin-bottom: 2px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: rgba(163, 196, 235, 0.75);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .nav a:hover {
+            background: rgba(163, 196, 235, 0.10);
+            color: var(--white);
+        }
+
+        .nav a.active {
+            background: rgba(255, 222, 112, 0.13);
+            color: var(--yellow);
+            font-weight: 600;
+        }
+
+        .nav a svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+
+        .nav-divider {
+            height: 1.5px;
+            background: rgba(163, 196, 235, 0.10);
+            margin: 10px 12px 12px;
+            border: none;
+        }
+
+        .sidebar-footer {
+            padding: 0 12px;
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: rgba(163, 196, 235, 0.55);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .sidebar-footer a:hover {
+            background: rgba(163, 196, 235, 0.08);
+            color: var(--powder);
+        }
+
+        .sidebar-footer a svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* ══════════ MAIN ══════════ */
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 36px 36px 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Page header */
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.55rem, 2.2vw, 2rem);
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+        }
+
+        .page-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* Botão primário */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 20px;
+            background: var(--navy);
+            color: var(--yellow);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            background: var(--navy-mid);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(23, 59, 100, 0.22);
+        }
+
+        .btn-primary svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* Botão secundário */
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 16px;
+            background: var(--white);
+            color: var(--navy);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--alice);
+            border-color: var(--powder);
+        }
+
+        .btn-secondary svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ══════════ FILTROS ══════════ */
+        .filters-bar {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(23, 59, 100, 0.05);
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-wrap svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--gray-300);
+            pointer-events: none;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 9px 12px 9px 38px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--navy);
+            background: var(--alice);
+            transition: border-color 0.18s, box-shadow 0.18s;
+            outline: none;
+        }
+
+        .search-wrap input:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(163, 196, 235, 0.22);
+            background: var(--white);
+        }
+
+        .search-wrap input::placeholder {
+            color: var(--gray-300);
+        }
+
+        .filter-select {
+            padding: 9px 32px 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--navy);
+            background: var(--alice);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7"><path fill="%23173B64" d="M0 0l5 7 5-7z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 11px center;
+            -webkit-appearance: none;
+            appearance: none;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.18s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--border-focus);
+        }
+
+        .filters-count {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+            white-space: nowrap;
+            padding-left: 4px;
+            font-weight: 600;
+        }
+
+        /* ══════════ TABLE CARD ══════════ */
+        .table-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 12px rgba(23, 59, 100, 0.07);
+            overflow: hidden;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 640px;
+        }
+
+        thead tr {
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        thead th {
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        thead th.sortable {
+            cursor: pointer;
+        }
+
+        thead th.sortable:hover {
+            color: var(--navy);
+        }
+
+        thead th .sort-icon {
+            display: inline-block;
+            margin-left: 4px;
+            opacity: 0.4;
+            font-style: normal;
+        }
+
+        thead th.sorted .sort-icon {
+            opacity: 1;
+            color: var(--navy-light);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--gray-50);
+            transition: background 0.12s;
+            cursor: pointer;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: var(--alice);
+        }
+
+        tbody td {
+            padding: 14px 20px;
+            font-size: 0.875rem;
+            color: var(--navy);
+            vertical-align: middle;
+        }
+
+        /* Avatar + nome */
+        .client-cell {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: 0.04em;
+        }
+
+        .client-name {
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .client-contact {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 1px;
+        }
+
+        /* Status pill */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        .status-pill::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-ativo {
+            background: rgba(22, 101, 52, 0.08);
+            color: #166534;
+        }
+
+        .status-ativo::before {
+            background: #22C55E;
+        }
+
+        .status-pendente {
+            background: rgba(194, 65, 12, 0.08);
+            color: #C2410C;
+        }
+
+        .status-pendente::before {
+            background: #F97316;
+        }
+
+        .status-inativo {
+            background: rgba(100, 116, 139, 0.08);
+            color: #475569;
+        }
+
+        .status-inativo::before {
+            background: #94A3B8;
+        }
+
+        /* Link button */
+        .link-copy {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-xs);
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0;
+            /* hide text fallback */
+        }
+
+        .link-copy:hover {
+            border-color: var(--powder);
+            background: var(--alice);
+            color: var(--navy);
+        }
+
+        .link-copy.copied {
+            border-color: #22C55E;
+            background: rgba(22, 101, 52, 0.07);
+            color: #166534;
+        }
+
+        .link-copy svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Row actions */
+        .row-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: var(--radius-xs);
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--powder);
+            background: var(--alice);
+            color: var(--navy);
+        }
+
+        .btn-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Table footer */
+        .table-footer {
+            padding: 14px 20px;
+            border-top: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border-radius: var(--radius-xs);
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            color: var(--gray-500);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: var(--powder);
+            background: var(--alice);
+            color: var(--navy);
+        }
+
+        .page-btn.active {
+            background: var(--navy);
+            color: var(--yellow);
+            border-color: var(--navy);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .table-info {
+            font-size: 0.78rem;
+            color: var(--gray-500);
+        }
+
+        /* ══════════ EMPTY STATE ══════════ */
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .empty-state.visible {
+            display: flex;
+        }
+
+        .empty-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--alice);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .empty-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--gray-300);
+        }
+
+        .empty-state h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+
+        /* ══════════ MODAL ══════════ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 30, 50, 0.45);
+            backdrop-filter: blur(3px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: min(100%, 540px);
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 80px rgba(23, 59, 100, 0.22);
+            transform: translateY(16px) scale(0.98);
+            transition: transform 0.22s;
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            background: var(--navy);
+            background-image: radial-gradient(ellipse 70% 60% at 100% 0%, rgba(163, 196, 235, 0.12) 0%, transparent 55%);
+            padding: 26px 28px 22px;
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .modal-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .modal-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--white);
+            border: 2.5px solid rgba(255, 222, 112, 0.35);
+            flex-shrink: 0;
+        }
+
+        .modal-client-name {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.15;
+        }
+
+        .modal-client-since {
+            font-size: 0.75rem;
+            color: var(--powder);
+            margin-top: 2px;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(163, 196, 235, 0.12);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(163, 196, 235, 0.75);
+            transition: background 0.15s, color 0.15s;
+            flex-shrink: 0;
+            margin-top: -2px;
+        }
+
+        .modal-close:hover {
+            background: rgba(163, 196, 235, 0.22);
+            color: var(--white);
+        }
+
+        .modal-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .modal-tabs {
+            display: flex;
+            border-bottom: 1.5px solid var(--border);
+            padding: 0 28px;
+            gap: 0;
+        }
+
+        .modal-tab {
+            padding: 13px 16px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2.5px solid transparent;
+            margin-bottom: -1.5px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .modal-tab:hover {
+            color: var(--navy);
+        }
+
+        .modal-tab.active {
+            color: var(--navy);
+            border-bottom-color: var(--navy);
+        }
+
+        .modal-body {
+            padding: 24px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .tab-panel {
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        /* Form fields dentro do modal */
+        .field-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--navy);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-body);
+            font-size: 0.875rem;
+            color: var(--navy);
+            outline: none;
+            transition: border-color 0.18s, box-shadow 0.18s;
+            background: var(--alice);
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(163, 196, 235, 0.22);
+            background: var(--white);
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: var(--gray-300);
+        }
+
+        .field select {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="7" viewBox="0 0 10 7"><path fill="%23173B64" d="M0 0l5 7 5-7z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 11px center;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Info view (read-only) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .info-item.full {
+            grid-column: 1 / -1;
+        }
+
+        .info-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .info-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .info-value.muted {
+            font-weight: 400;
+            color: var(--gray-500);
+            font-style: italic;
+        }
+
+        /* Link display */
+        .link-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--alice);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .link-display span {
+            font-size: 0.8rem;
+            color: var(--navy-light);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: monospace;
+        }
+
+        .link-display button {
+            flex-shrink: 0;
+            padding: 4px 10px;
+            background: var(--navy);
+            color: var(--yellow);
+            border: none;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.04em;
+            transition: background 0.15s;
+        }
+
+        .link-display button:hover {
+            background: var(--navy-mid);
+        }
+
+        /* Histórico tab */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .history-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-50);
+            position: relative;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--powder);
+            border: 2px solid var(--white);
+            box-shadow: 0 0 0 1.5px var(--gray-300);
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .history-dot.green {
+            background: #22C55E;
+            box-shadow: 0 0 0 1.5px #166534;
+        }
+
+        .history-dot.orange {
+            background: #F97316;
+            box-shadow: 0 0 0 1.5px #C2410C;
+        }
+
+        .history-text {
+            font-size: 0.85rem;
+            color: var(--navy);
+            line-height: 1.45;
+        }
+
+        .history-time {
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            margin-top: 2px;
+        }
+
+        /* Modal footer */
+        .modal-footer {
+            padding: 0 28px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--navy);
+            color: var(--yellow);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            box-shadow: 0 8px 32px rgba(23, 59, 100, 0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s, transform 0.22s;
+            z-index: 200;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ══════════ RESPONSIVE ══════════ */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 64px;
+            }
+
+            .sidebar-brand .brand-name,
+            .sidebar-brand .brand-sub,
+            .nav a span,
+            .sidebar-footer a span {
+                display: none;
+            }
+
+            .nav a,
+            .sidebar-footer a {
+                justify-content: center;
+                padding: 10px;
+            }
+
+            .sidebar-brand .brand-icon {
+                justify-content: center;
+            }
+
+            .main {
+                padding: 22px 16px 36px;
+            }
+
+            .field-group {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal {
+                border-radius: var(--radius-lg);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .filters-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .table-footer {
+                flex-direction: column-reverse;
+                align-items: flex-end;
+            }
+
+            .modal-header {
+                padding: 20px 20px 16px;
+            }
+
+            .modal-body {
+                padding: 18px 20px 20px;
+            }
+
+            .modal-footer {
+                padding: 0 20px 20px;
+            }
+
+            .modal-tabs {
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- ════ SIDEBAR ════ -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <div class="icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="#173B64">
+                            <path
+                                d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9L2 14v2l9-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L14 19v-5.5L21 16z" />
+                        </svg>
+                    </div>
+                    <span class="brand-name">TravelWallet</span>
+                </div>
+                <div class="brand-sub">Travel Joy Brasil</div>
+            </div>
+            <ul class="nav">
+                <li><a href="admin.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                            <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                        <span>Dashboard</span>
+                    </a></li>
+                <li><a href="#" class="active">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        <span>Clientes</span>
+                    </a></li>
+                <li><a href="#">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                        </svg>
+                        <span>Documentos</span>
+                    </a></li>
+                <li><a href="#">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                        </svg>
+                        <span>Links Gerados</span>
+                    </a></li>
+                <li><a href="admin_logs.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                        <span>Logs</span>
+                    </a></li>
+            </ul>
+        </aside>
+
+        <!-- ════ MAIN ════ -->
+        <main class="main">
+
+            <!-- Header -->
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Clientes</h1>
+                    <p class="page-subtitle" id="headerSubtitle">128 clientes cadastrados</p>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="filters-bar">
+                <div class="search-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input type="search" id="searchInput" placeholder="Buscar por nome, email ou destino…"
+                        oninput="applyFilters()">
+                </div>
+                <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+                    <option value="">Todos os status</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Pendente">Pendente</option>
+                    <option value="Inativo">Inativo</option>
+                </select>
+                <select class="filter-select" id="destinoFilter" onchange="applyFilters()">
+                    <option value="">Todos os destinos</option>
+                    <!-- Preenher com os destinos dentro do formulário -->
+                    <option value="IDS Cologne 2026">-</option>
+                </select>
+                <span class="filters-count" id="filtersCount"></span>
+            </div>
+
+            <!-- Tabela -->
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="sortable sorted" data-col="nome" onclick="sortBy('nome')">Cliente <i
+                                        class="sort-icon">↑</i></th>
+                                <th class="sortable" data-col="destino" onclick="sortBy('destino')">Destino <i
+                                        class="sort-icon">↕</i></th>
+                                <th class="sortable" data-col="status" onclick="sortBy('status')">Status <i
+                                        class="sort-icon">↕</i></th>
+                                <th class="sortable" data-col="cadastro" onclick="sortBy('cadastro')">Cadastro <i
+                                        class="sort-icon">↕</i></th>
+                                <th>Link</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </div>
+                        <h3>Nenhum cliente encontrado</h3>
+                        <p>Tente ajustar os filtros ou o termo de busca.</p>
+                    </div>
+                </div>
+                <div class="table-footer">
+                    <span class="table-info" id="tableInfo"></span>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ════ MODAL CLIENTE ════ -->
+    <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-header-left">
+                    <div class="modal-avatar" id="modalAvatar"></div>
+                    <div>
+                        <div class="modal-client-name" id="modalClientName">Novo Cliente</div>
+                        <div class="modal-client-since" id="modalClientSince"></div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-tabs" id="modalTabs">
+                <button class="modal-tab active" data-tab="info" onclick="switchTab('info')">Informações</button>
+                <button class="modal-tab" data-tab="editar" onclick="switchTab('editar')">Editar</button>
+                <button class="modal-tab" data-tab="historico" onclick="switchTab('historico')">Histórico</button>
+            </div>
+
+            <div class="modal-body">
+
+                <!-- Tab: Informações -->
+                <div class="tab-panel active" id="tab-info">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nome completo</span>
+                            <span class="info-value" id="info-nome">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value" id="info-status-badge"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">E-mail</span>
+                            <span class="info-value" id="info-email">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Telefone</span>
+                            <span class="info-value" id="info-telefone">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Destino / Evento</span>
+                            <span class="info-value" id="info-destino">—</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cadastro</span>
+                            <span class="info-value" id="info-cadastro">—</span>
+                        </div>
+                        <div class="info-item full">
+                            <span class="info-label">Observações</span>
+                            <span class="info-value" id="info-obs"
+                                style="font-weight:400; white-space:pre-line;">—</span>
+                        </div>
+                        <div class="info-item full">
+                            <span class="info-label">Link personalizado</span>
+                            <div class="link-display" id="info-link-display">
+                                <span id="info-link-text">—</span>
+                                <button onclick="copyModalLink()">Copiar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Editar -->
+                <div class="tab-panel" id="tab-editar">
+                    <div class="field-group">
+                        <div class="field">
+                            <label>Nome completo</label>
+                            <input type="text" id="edit-nome" placeholder="ex: João Silva">
+                        </div>
+                        <div class="field">
+                            <label>Status</label>
+                            <select id="edit-status">
+                                <option value="Ativo">Ativo</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>E-mail</label>
+                            <input type="email" id="edit-email" placeholder="email@exemplo.com">
+                        </div>
+                        <div class="field">
+                            <label>Telefone</label>
+                            <input type="tel" id="edit-telefone" placeholder="+55 92 9 0000-0000">
+                        </div>
+                        <div class="field">
+                            <label>Destino / Evento</label>
+                            <select id="edit-destino">
+                                <option value="">Selecione…</option>
+
+                                <!-- Preencher com a aba de destinos do formuláro -->
+                                <option>-</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Data de cadastro</label>
+                            <input type="date" id="edit-cadastro">
+                        </div>
+                        <div class="field full">
+                            <label>Observações</label>
+                            <textarea id="edit-obs" placeholder="Notas internas sobre o cliente…"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Histórico -->
+                <div class="tab-panel" id="tab-historico">
+                    <div class="history-list" id="historyList"></div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn-secondary" onclick="closeModal()">Fechar</button>
+                <button class="btn-primary" id="modalSaveBtn" onclick="saveClient()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Salvar alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ══════════════════════════════════
+           ESTADO
+        ══════════════════════════════════ */
+        let currentPage = 1;
+        const PER_PAGE = 8;
+        let sortCol = 'nome';
+        let sortDir = 'asc';
+        let filtered = [...clientes];
+        let currentClient = null;
+        let isNew = false;
+
+        /* ══════════════════════════════════
+           RENDER
+        ══════════════════════════════════ */
+        function initials(nome) {
+            return nome.trim().split(' ').slice(0, 2).map(p => p[0]).join('').toUpperCase();
+        }
+
+        function avatarColor(id) {
+            return AVATAR_COLORS[id % AVATAR_COLORS.length];
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '—';
+            const [y, m, d] = iso.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function statusClass(s) {
+            return 'status-' + s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const empty = document.getElementById('emptyState');
+            const start = (currentPage - 1) * PER_PAGE;
+            const page = filtered.slice(start, start + PER_PAGE);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.add('visible');
+            } else {
+                empty.classList.remove('visible');
+                tbody.innerHTML = page.map(c => `
+        <tr onclick="openModal(${c.id})">
+          <td>
+            <div class="client-cell">
+              <div class="avatar" style="background:${avatarColor(c.id)}">${initials(c.nome)}</div>
+              <div>
+                <div class="client-name">${c.nome}</div>
+                <div class="client-contact">${c.email}</div>
+              </div>
+            </div>
+          </td>
+          <td>${c.destino}</td>
+          <td><span class="status-pill ${statusClass(c.status)}">${c.status}</span></td>
+          <td>${formatDate(c.cadastro)}</td>
+          <td onclick="event.stopPropagation()">
+            <button class="link-copy" id="copy-${c.id}" title="Copiar link" onclick="copyLink(${c.id}, event)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </button>
+          </td>
+          <td onclick="event.stopPropagation()">
+            <div class="row-actions">
+              <button class="btn-icon" title="Ver detalhes" onclick="openModal(${c.id})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+              <button class="btn-icon" title="Editar" onclick="openModal(${c.id}, 'editar')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+            }
+
+            renderPagination();
+            renderInfo();
+        }
+
+        function renderPagination() {
+            const total = Math.ceil(filtered.length / PER_PAGE);
+            const pag = document.getElementById('pagination');
+            if (total <= 1) { pag.innerHTML = ''; return; }
+
+            let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+            for (let i = 1; i <= total; i++) {
+                if (i === 1 || i === total || Math.abs(i - currentPage) <= 1) {
+                    html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+                } else if (Math.abs(i - currentPage) === 2) {
+                    html += `<span class="page-btn" style="border:none;background:none;cursor:default;color:var(--gray-300)">…</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>›</button>`;
+            pag.innerHTML = html;
+        }
+
+        function renderInfo() {
+            const start = (currentPage - 1) * PER_PAGE + 1;
+            const end = Math.min(currentPage * PER_PAGE, filtered.length);
+            document.getElementById('tableInfo').textContent =
+                filtered.length === 0 ? '' :
+                    `Exibindo ${start}–${end} de ${filtered.length} cliente${filtered.length !== 1 ? 's' : ''}`;
+        }
+
+        function goPage(p) {
+            const total = Math.ceil(filtered.length / PER_PAGE);
+            if (p < 1 || p > total) return;
+            currentPage = p;
+            renderTable();
+        }
+
+        /* ══════════════════════════════════
+           FILTROS & ORDENAÇÃO
+        ══════════════════════════════════ */
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            const status = document.getElementById('statusFilter').value;
+            const dest = document.getElementById('destinoFilter').value;
+
+            filtered = clientes.filter(c => {
+                const matchQ = !q || c.nome.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.destino.toLowerCase().includes(q);
+                const matchS = !status || c.status === status;
+                const matchD = !dest || c.destino === dest;
+                return matchQ && matchS && matchD;
+            });
+
+            sortFiltered();
+            currentPage = 1;
+            renderTable();
+
+            const count = filtered.length;
+            document.getElementById('filtersCount').textContent =
+                (q || status || dest) ? `${count} resultado${count !== 1 ? 's' : ''}` : '';
+        }
+
+        function sortBy(col) {
+            if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+            else { sortCol = col; sortDir = 'asc'; }
+
+            document.querySelectorAll('thead th').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) icon.textContent = '↕';
+            });
+            const activeTh = document.querySelector(`th[data-col="${col}"]`);
+            if (activeTh) {
+                activeTh.classList.add('sorted');
+                const icon = activeTh.querySelector('.sort-icon');
+                if (icon) icon.textContent = sortDir === 'asc' ? '↑' : '↓';
+            }
+
+            sortFiltered();
+            renderTable();
+        }
+
+        function sortFiltered() {
+            filtered.sort((a, b) => {
+                let va = a[sortCol] || '', vb = b[sortCol] || '';
+                const cmp = va.localeCompare(vb, 'pt-BR', { sensitivity: 'base' });
+                return sortDir === 'asc' ? cmp : -cmp;
+            });
+        }
+
+        /* ══════════════════════════════════
+           MODAL
+        ══════════════════════════════════ */
+        function openModal(id, tab = 'info') {
+            isNew = false;
+            currentClient = clientes.find(c => c.id === id);
+            if (!currentClient) return;
+
+            // Header
+            document.getElementById('modalAvatar').textContent = initials(currentClient.nome);
+            document.getElementById('modalAvatar').style.background = avatarColor(currentClient.id);
+            document.getElementById('modalClientName').textContent = currentClient.nome;
+            document.getElementById('modalClientSince').textContent = `Cliente desde ${formatDate(currentClient.cadastro)}`;
+            document.getElementById('modalSaveBtn').style.display = '';
+            document.getElementById('modalTabs').style.display = '';
+
+            populateInfo(currentClient);
+            populateEdit(currentClient);
+            populateHistory(currentClient.id);
+
+            switchTab(tab);
+            document.getElementById('modalOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function openNewClientModal() {
+            isNew = true;
+            currentClient = null;
+
+            document.getElementById('modalAvatar').textContent = '+';
+            document.getElementById('modalAvatar').style.background = 'var(--navy-mid)';
+            document.getElementById('modalClientName').textContent = 'Novo Cliente';
+            document.getElementById('modalClientSince').textContent = 'Preencha os dados abaixo';
+            document.getElementById('modalSaveBtn').innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Cadastrar cliente
+    `;
+
+            // Reset edit fields
+            ['edit-nome', 'edit-email', 'edit-telefone', 'edit-obs'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('edit-status').value = 'Ativo';
+            document.getElementById('edit-destino').value = '';
+            document.getElementById('edit-cadastro').value = new Date().toISOString().split('T')[0];
+
+            // Only show editar tab
+            document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector('[data-tab="editar"]').classList.add('active');
+            document.getElementById('tab-editar').classList.add('active');
+
+            document.getElementById('modalOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === document.getElementById('modalOverlay')) closeModal();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+
+            // Esconde botão salvar na aba info/histórico
+            document.getElementById('modalSaveBtn').style.display = tab === 'editar' ? '' : 'none';
+        }
+
+        function populateInfo(c) {
+            document.getElementById('info-nome').textContent = c.nome;
+            document.getElementById('info-email').textContent = c.email;
+            document.getElementById('info-telefone').textContent = c.telefone;
+            document.getElementById('info-destino').textContent = c.destino;
+            document.getElementById('info-cadastro').textContent = formatDate(c.cadastro);
+            document.getElementById('info-obs').textContent = c.obs || '—';
+            document.getElementById('info-obs').className = 'info-value' + (c.obs ? '' : ' muted');
+            document.getElementById('info-link-text').textContent = c.link;
+
+            const badge = document.getElementById('info-status-badge');
+            badge.innerHTML = `<span class="status-pill ${statusClass(c.status)}">${c.status}</span>`;
+        }
+
+        function populateEdit(c) {
+            document.getElementById('edit-nome').value = c.nome;
+            document.getElementById('edit-email').value = c.email;
+            document.getElementById('edit-telefone').value = c.telefone;
+            document.getElementById('edit-status').value = c.status;
+            document.getElementById('edit-destino').value = c.destino;
+            document.getElementById('edit-cadastro').value = c.cadastro;
+            document.getElementById('edit-obs').value = c.obs || '';
+        }
+
+        function populateHistory(id) {
+            const items = historicos[id] || [{ tipo: '', texto: 'Nenhum evento registrado ainda.', data: '' }];
+            document.getElementById('historyList').innerHTML = items.map(h => `
+      <div class="history-item">
+        <div class="history-dot ${h.tipo}"></div>
+        <div>
+          <div class="history-text">${h.texto}</div>
+          ${h.data ? `<div class="history-time">${h.data}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+        }
+
+        function saveClient() {
+            const nome = document.getElementById('edit-nome').value.trim();
+            const email = document.getElementById('edit-email').value.trim();
+            const telefone = document.getElementById('edit-telefone').value.trim();
+            const status = document.getElementById('edit-status').value;
+            const destino = document.getElementById('edit-destino').value;
+            const cadastro = document.getElementById('edit-cadastro').value;
+            const obs = document.getElementById('edit-obs').value.trim();
+
+            if (!nome || !email) { showToast('Preencha nome e e-mail.'); return; }
+
+            if (isNew) {
+                const newId = Math.max(...clientes.map(c => c.id)) + 1;
+                const slug = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-');
+                clientes.unshift({ id: newId, nome, email, telefone, status, destino, cadastro, obs, link: `https://tw.joy/${slug}` });
+                showToast('Cliente cadastrado!');
+            } else {
+                Object.assign(currentClient, { nome, email, telefone, status, destino, cadastro, obs });
+                showToast('Alterações salvas!');
+            }
+
+            applyFilters();
+            document.getElementById('headerSubtitle').textContent = `${clientes.length} clientes cadastrados`;
+            closeModal();
+        }
+
+        /* ══════════════════════════════════
+           COPY LINK
+        ══════════════════════════════════ */
+        function copyLink(id, e) {
+            const c = clientes.find(x => x.id === id);
+            if (!c) return;
+            navigator.clipboard.writeText(c.link).catch(() => { });
+            const btn = document.getElementById('copy-' + id);
+            if (btn) {
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 1500);
+            }
+            showToast('Link copiado!');
+        }
+
+        function copyModalLink() {
+            if (!currentClient) return;
+            navigator.clipboard.writeText(currentClient.link).catch(() => { });
+            showToast('Link copiado!');
+        }
+
+        /* ══════════════════════════════════
+           TOAST
+        ══════════════════════════════════ */
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        /* ══════════════════════════════════
+           TECLADO
+        ══════════════════════════════════ */
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        /* ══════════════════════════════════
+           INIT
+        ══════════════════════════════════ */
+        sortFiltered();
+        renderTable();
+    </script>
+</body>
+
+</html>
