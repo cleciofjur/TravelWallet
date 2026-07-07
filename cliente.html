@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <title>TravelWallet — Travel Joy</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --navy: #173B64;
+            --navy-mid: #1E4E82;
+            --navy-light: #2A6AAD;
+            --powder: #A3C4EB;
+            --alice: #F6FAFF;
+            --yellow: #FFDE70;
+            --yellow-hover: #F5D04A;
+            --yellow-glow: rgba(255, 222, 112, 0.35);
+            --white: #FFFFFF;
+            --gray-50: #F0F6FF;
+            --gray-100: #DDE9F5;
+            --gray-300: #8AABC8;
+            --gray-500: #4A6A8A;
+            --border: #DDE9F5;
+
+            --radius-xs: 8px;
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 22px;
+            --radius-xl: 32px;
+
+            --shadow-card: 0 8px 40px rgba(23, 59, 100, 0.11);
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--navy);
+            background: var(--navy);
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════════════
+       HERO HEADER
+    ══════════════════════════════════════ */
+        .hero {
+            position: relative;
+            background: var(--navy);
+            background-image:
+                radial-gradient(ellipse 80% 60% at 80% 20%, rgba(163, 196, 235, 0.14) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 40% at 10% 90%, rgba(255, 222, 112, 0.08) 0%, transparent 50%);
+            padding: 0 0 56px;
+            overflow: hidden;
+        }
+
+        /* Topbar */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 40px;
+            border-bottom: 1px solid rgba(163, 196, 235, 0.10);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--yellow);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .brand-name {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--white);
+            letter-spacing: -0.01em;
+        }
+
+        .brand-sub {
+            font-size: 0.68rem;
+            font-weight: 500;
+            color: var(--powder);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-left: 2px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(163, 196, 235, 0.10);
+            border: 1px solid rgba(163, 196, 235, 0.18);
+            color: var(--powder);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .contact-btn:hover {
+            background: rgba(163, 196, 235, 0.18);
+            color: var(--white);
+        }
+
+        .contact-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Hero content */
+        .hero-body {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 52px 40px 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .hero-left {}
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            color: var(--yellow);
+            margin-bottom: 14px;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 22px;
+            height: 1.5px;
+            background: var(--yellow);
+            border-radius: 2px;
+        }
+
+        .hero-greeting {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+        }
+
+        .hero-greeting em {
+            font-style: italic;
+            color: var(--yellow);
+        }
+
+        .hero-sub {
+            font-size: 0.9rem;
+            color: rgba(163, 196, 235, 0.75);
+            font-weight: 400;
+            max-width: 380px;
+            line-height: 1.65;
+        }
+
+        /* Trip summary pills */
+        .trip-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .trip-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 14px;
+            border-radius: 999px;
+            background: rgba(163, 196, 235, 0.10);
+            border: 1px solid rgba(163, 196, 235, 0.18);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .trip-pill svg {
+            width: 13px;
+            height: 13px;
+            color: var(--yellow);
+            flex-shrink: 0;
+        }
+
+        /* Progress counter */
+        .hero-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .stat-ring-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .stat-ring-wrap svg {
+            transform: rotate(-90deg);
+        }
+
+        .stat-ring-bg {
+            fill: none;
+            stroke: rgba(163, 196, 235, 0.12);
+            stroke-width: 5;
+        }
+
+        .stat-ring-fill {
+            fill: none;
+            stroke: var(--yellow);
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 213;
+            stroke-dashoffset: 53;
+            /* 75% = 213 * 0.25 */
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .stat-ring-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1;
+        }
+
+        .stat-ring-label {
+            font-size: 0.6rem;
+            color: var(--powder);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-top: 1px;
+        }
+
+        .stat-hint {
+            font-size: 0.7rem;
+            color: rgba(163, 196, 235, 0.55);
+            text-align: right;
+            max-width: 120px;
+            line-height: 1.45;
+        }
+
+        /* ══════════════════════════════════════
+       WAVE DIVIDER
+    ══════════════════════════════════════ */
+        .wave {
+            display: block;
+            width: 100%;
+            height: 48px;
+            background: var(--navy);
+        }
+
+        .page-body {
+            background: var(--gray-50);
+        }
+
+        /* ══════════════════════════════════════
+       CONTENT WRAPPER
+    ══════════════════════════════════════ */
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 40px 64px;
+        }
+
+        /* Section header */
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.10em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--yellow);
+            border: 2px solid var(--navy);
+            flex-shrink: 0;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 0 0 32px;
+            height: 1.5px;
+            background: linear-gradient(90deg, var(--border), transparent);
+        }
+
+        /* ══════════════════════════════════════
+       DOCUMENT CATEGORIES (tabs)
+    ══════════════════════════════════════ */
+        .cat-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .cat-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .cat-tab:hover {
+            border-color: var(--powder);
+            color: var(--navy);
+            background: var(--alice);
+        }
+
+        .cat-tab.active {
+            background: var(--navy);
+            color: var(--yellow);
+            border-color: var(--navy);
+            box-shadow: 0 4px 14px rgba(23, 59, 100, 0.18);
+        }
+
+        .cat-tab svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .cat-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: rgba(163, 196, 235, 0.22);
+            color: var(--navy-light);
+        }
+
+        .cat-tab.active .cat-badge {
+            background: rgba(255, 222, 112, 0.22);
+            color: var(--yellow);
+        }
+
+        /* ══════════════════════════════════════
+       DOCUMENT CARDS
+    ══════════════════════════════════════ */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .doc-card {
+            background: var(--white);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(23, 59, 100, 0.06);
+            transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .doc-card:hover {
+            box-shadow: var(--shadow-card);
+            transform: translateY(-3px);
+            border-color: var(--powder);
+        }
+
+        .doc-card.new-badge {
+            border-color: rgba(255, 222, 112, 0.5);
+        }
+
+        /* Card color strip */
+        .doc-strip {
+            height: 5px;
+            flex-shrink: 0;
+        }
+
+        /* Card body */
+        .doc-body {
+            padding: 20px 20px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .doc-icon-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .doc-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .doc-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .doc-new-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(255, 222, 112, 0.18);
+            border: 1px solid rgba(255, 222, 112, 0.4);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #92600A;
+            text-transform: uppercase;
+        }
+
+        .doc-new-tag::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #F59E0B;
+        }
+
+        .doc-name {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--navy);
+            line-height: 1.25;
+        }
+
+        .doc-meta {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            line-height: 1.5;
+        }
+
+        .doc-meta span {
+            display: block;
+        }
+
+        /* Card footer */
+        .doc-footer {
+            padding: 12px 20px;
+            border-top: 1.5px solid var(--gray-50);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-open {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--navy);
+            color: var(--yellow);
+            border: none;
+            font-family: var(--font-body);
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.15s, transform 0.12s;
+        }
+
+        .btn-open:hover {
+            background: var(--navy-mid);
+            transform: translateY(-1px);
+        }
+
+        .btn-open svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .btn-dl {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            color: var(--gray-500);
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .btn-dl:hover {
+            border-color: var(--powder);
+            background: var(--alice);
+            color: var(--navy);
+        }
+
+        .btn-dl svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ══════════════════════════════════════
+       EMPTY CATEGORY
+    ══════════════════════════════════════ */
+        .cat-empty {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 52px 24px;
+            text-align: center;
+            grid-column: 1 / -1;
+        }
+
+        .cat-empty.show {
+            display: flex;
+        }
+
+        .cat-empty-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: var(--alice);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .cat-empty-icon svg {
+            width: 22px;
+            height: 22px;
+            color: var(--gray-300);
+        }
+
+        .cat-empty h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .cat-empty p {
+            font-size: 0.82rem;
+            color: var(--gray-500);
+        }
+
+        /* ══════════════════════════════════════
+       MODAL PREVIEW
+    ══════════════════════════════════════ */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 22, 38, 0.55);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s;
+        }
+
+        .overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: min(100%, 520px);
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 28px 90px rgba(10, 22, 38, 0.28);
+            transform: translateY(18px) scale(0.97);
+            transition: transform 0.22s;
+        }
+
+        .overlay.open .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-hero {
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 28px 28px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .modal-doc-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .modal-doc-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .modal-doc-name {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        .modal-doc-cat {
+            font-size: 0.72rem;
+            color: rgba(163, 196, 235, 0.7);
+            font-weight: 500;
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(163, 196, 235, 0.12);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(163, 196, 235, 0.7);
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .modal-close:hover {
+            background: rgba(163, 196, 235, 0.22);
+            color: var(--white);
+        }
+
+        .modal-close svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .modal-body {
+            padding: 22px 28px;
+        }
+
+        /* Preview area */
+        .preview-area {
+            background: var(--alice);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 28px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .preview-area svg {
+            width: 36px;
+            height: 36px;
+            color: var(--gray-300);
+        }
+
+        .preview-area p {
+            font-size: 0.82rem;
+            color: var(--gray-500);
+        }
+
+        .preview-area strong {
+            font-size: 0.92rem;
+            color: var(--navy);
+            font-weight: 700;
+            display: block;
+        }
+
+        /* Modal actions */
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-modal-open {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            background: var(--navy);
+            color: var(--yellow);
+            border: none;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.12s;
+        }
+
+        .btn-modal-open:hover {
+            background: var(--navy-mid);
+            transform: translateY(-1px);
+        }
+
+        .btn-modal-open svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        .btn-modal-dl {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border);
+            background: var(--white);
+            color: var(--navy);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-modal-dl:hover {
+            border-color: var(--powder);
+            background: var(--alice);
+        }
+
+        .btn-modal-dl svg {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* ══════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════ */
+        .portal-footer {
+            background: var(--navy);
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 0.75rem;
+            color: rgba(163, 196, 235, 0.45);
+        }
+
+        .portal-footer a {
+            color: var(--powder);
+            text-decoration: none;
+        }
+
+        .portal-footer strong {
+            color: var(--powder);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: var(--navy);
+            color: var(--yellow);
+            padding: 10px 22px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            font-weight: 700;
+            box-shadow: 0 8px 32px rgba(23, 59, 100, 0.28);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 200;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ══════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════ */
+        @media (max-width: 680px) {
+            .topbar {
+                padding: 16px 20px;
+            }
+
+            .hero-body {
+                padding: 36px 20px 0;
+            }
+
+            .hero-stats {
+                display: none;
+            }
+
+            .content {
+                padding: 28px 20px 52px;
+            }
+
+            .doc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-body {
+                padding: 18px 20px;
+            }
+
+            .modal-hero {
+                padding: 22px 20px 18px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-modal-open,
+            .btn-modal-dl {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .hero-greeting {
+                font-size: 1.6rem;
+            }
+
+            .cat-tabs {
+                gap: 5px;
+            }
+
+            .cat-tab {
+                padding: 7px 12px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ════════════════════ HERO ════════════════════ -->
+    <header class="hero">
+        <nav class="topbar">
+            <a class="brand" href="#">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="#173B64">
+                        <path
+                            d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9L2 14v2l9-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L14 19v-5.5L21 16z" />
+                    </svg>
+                </div>
+                <span class="brand-name">TravelWallet</span>
+                <span class="brand-sub">· Travel Joy</span>
+            </a>
+            <div class="topbar-right">
+
+                <!-- WhatsApp da agência -->
+                <a class="contact-btn" href="https://wa.me/559282905854">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Falar com agente
+                </a>
+            </div>
+        </nav>
+
+        <div class="hero-body">
+            <div class="hero-left">
+                <div class="hero-eyebrow">Sua jornada começa aqui</div>
+                <h1 class="hero-greeting">
+
+                    <!-- Uso de uma variável para armazenaer esse nome -->
+                    Olá, <em>João Silva</em>!<br>Sua viagem está pronta.
+                </h1>
+                <p class="hero-sub">
+                    Todos os documentos da sua viagem estão organizados abaixo. Acesse, baixe e guarde onde quiser.
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Wave -->
+    <div style="background:var(--navy); line-height:0">
+        <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+            style="display:block;width:100%;height:48px">
+            <path d="M0,48 C360,0 1080,0 1440,48 L1440,48 L0,48 Z" fill="#F0F6FF" />
+        </svg>
+    </div>
+
+    <!-- ════════════════════ CONTENT ════════════════════ -->
+    <div class="page-body">
+        <div class="content">
+
+            <!-- Section head -->
+            <div class="section-head">
+                <div class="section-title">Documentos da viagem</div>
+            </div>
+
+            <!-- Category tabs -->
+            <div class="cat-tabs" id="catTabs">
+                <button class="cat-tab active" data-cat="todos" onclick="filterCat('todos')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                    Todos
+                    <span class="cat-badge" id="badge-todos">6</span>
+                </button>
+                <button class="cat-tab" data-cat="aereo" onclick="filterCat('aereo')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9L2 14v2l9-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L14 19v-5.5L21 16z" />
+                    </svg>
+                    Passagens
+                    <span class="cat-badge" id="badge-aereo">2</span>
+                </button>
+                <button class="cat-tab" data-cat="hospedagem" onclick="filterCat('hospedagem')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                    Hospedagem
+                    <span class="cat-badge" id="badge-hospedagem">1</span>
+                </button>
+                <button class="cat-tab" data-cat="seguro" onclick="filterCat('seguro')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    Seguro
+                    <span class="cat-badge" id="badge-seguro">1</span>
+                </button>
+                <button class="cat-tab" data-cat="roteiro" onclick="filterCat('roteiro')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    Roteiro
+                    <span class="cat-badge" id="badge-roteiro">1</span>
+                </button>
+                <button class="cat-tab" data-cat="visto" onclick="filterCat('visto')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="12" cy="10" r="3" />
+                        <path d="M7 21v-1a5 5 0 0 1 10 0v1" />
+                    </svg>
+                    Visto &amp; Docs
+                    <span class="cat-badge" id="badge-visto">1</span>
+                </button>
+                <button class="cat-tab" data-cat="ingresso" onclick="filterCat('ingresso')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z" />
+                    </svg>
+                    Ingressos
+                    <span class="cat-badge" id="badge-ingresso">0</span>
+                </button>
+            </div>
+
+            <!-- Document grid -->
+            <div class="doc-grid" id="docGrid">
+                <!-- rendered by JS -->
+                <div class="cat-empty" id="emptyState">
+                    <div class="cat-empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                        </svg>
+                    </div>
+                    <h3>Nenhum documento nesta categoria</h3>
+                    <p>Seu agente ainda não adicionou arquivos aqui.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ════════════════════ FOOTER ════════════════════ -->
+    <footer class="portal-footer">
+
+        Página gerada por <strong>Travel Joy Brasil</strong> · <a href="https://wa.me/559282905854">Falar com seu
+            agente</a>
+    </footer>
+
+    <!-- ════════════════════ MODAL ════════════════════ -->
+    <div class="overlay" id="overlay" onclick="handleOverlay(event)">
+        <div class="modal">
+            <div class="modal-hero" id="modalHero">
+                <div class="modal-doc-icon" id="modalIcon"></div>
+                <div>
+                    <div class="modal-doc-name" id="modalName"></div>
+                    <div class="modal-doc-cat" id="modalCat"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-area">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                        <polyline points="10 9 9 9 8 9" />
+                    </svg>
+                    <div>
+                        <strong id="modalPreviewName"></strong>
+                        <p>Clique em "Abrir arquivo" para visualizar o documento no seu navegador.</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal-open" id="modalOpenBtn" onclick="openFile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                        Abrir arquivo
+                    </button>
+                    <button class="btn-modal-dl" onclick="downloadFile()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7 10 12 15 17 10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Baixar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ══════════════════════════════════
+           CONFIG POR CATEGORIA
+        ══════════════════════════════════ */
+        const CAT_CONFIG = {
+            aereo: { label: 'Passagem aérea', color: '#173B64', light: 'rgba(23,59,100,0.08)', strip: '#2A6AAD' },
+            hospedagem: { label: 'Hospedagem', color: '#166534', light: 'rgba(22,101,52,0.08)', strip: '#22C55E' },
+            seguro: { label: 'Seguro viagem', color: '#92600A', light: 'rgba(146,96,10,0.08)', strip: '#F59E0B' },
+            roteiro: { label: 'Roteiro', color: '#5B21B6', light: 'rgba(91,33,182,0.08)', strip: '#8B5CF6' },
+            visto: { label: 'Visto & Documentação', color: '#9A3412', light: 'rgba(154,52,18,0.08)', strip: '#F97316' },
+            ingresso: { label: 'Ingresso / Reserva', color: '#0E7490', light: 'rgba(14,116,144,0.08)', strip: '#06B6D4' },
+        };
+
+        /* ══════════════════════════════════
+           DADOS DO CLIENTE
+        ══════════════════════════════════ */
+        const docs = [
+            {
+                id: 1, cat: 'aereo', isNew: true,
+                nome: 'Passagem GRU → FRA (ida)',
+                arquivo: 'passagem-gru-fra.pdf'
+            },
+            {
+                id: 2, cat: 'aereo', isNew: false,
+                nome: 'Passagem FRA → GRU (volta)',
+                arquivo: 'passagem-fra-gru.pdf'
+            },
+            {
+                id: 3, cat: 'hospedagem', isNew: true,
+                nome: 'Voucher — Hotel Domstern',
+                arquivo: 'voucher-hotel-domstern.pdf'
+            },
+            {
+                id: 4, cat: 'seguro', isNew: false,
+                nome: 'Apólice de Seguro Viagem',
+                arquivo: 'apolice-seguro.pdf'
+            },
+            {
+                id: 5, cat: 'roteiro', isNew: true,
+                nome: 'Roteiro completo — IDS 2026',
+                arquivo: 'roteiro-ids-cologne.pdf'
+            },
+            {
+                id: 6, cat: 'visto', isNew: false,
+                nome: 'Autorização de Viagem AES',
+                arquivo: 'visto-aes-alemanha.pdf'
+            },
+        ];
+
+        /* ══════════════════════════════════
+           ICONS SVG por categoria
+        ══════════════════════════════════ */
+        const ICONS = {
+            aereo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9L2 14v2l9-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L14 19v-5.5L21 16z"/></svg>`,
+            hospedagem: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+            seguro: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+            roteiro: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+            visto: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 21v-1a5 5 0 0 1 10 0v1"/></svg>`,
+            ingresso: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/></svg>`,
+        };
+
+        /* ══════════════════════════════════
+           STATE
+        ══════════════════════════════════ */
+        let currentCat = 'todos';
+        let activeDoc = null;
+
+        /* ══════════════════════════════════
+           RENDER CARDS
+        ══════════════════════════════════ */
+        function renderCards() {
+            const grid = document.getElementById('docGrid');
+            const empty = document.getElementById('emptyState');
+            const list = currentCat === 'todos' ? docs : docs.filter(d => d.cat === currentCat);
+
+            // Remove existing cards (keep empty state el)
+            [...grid.children].forEach(el => { if (el !== empty) el.remove(); });
+
+            if (list.length === 0) {
+                empty.classList.add('show');
+                return;
+            }
+            empty.classList.remove('show');
+
+            list.forEach(doc => {
+                const cfg = CAT_CONFIG[doc.cat];
+                const card = document.createElement('div');
+                card.className = 'doc-card' + (doc.isNew ? ' new-badge' : '');
+                card.onclick = () => openModal(doc.id);
+                card.innerHTML = `
+        <div class="doc-strip" style="background:${cfg.strip}"></div>
+        <div class="doc-body">
+          <div class="doc-icon-row">
+            <div class="doc-icon" style="background:${cfg.light}; color:${cfg.color}">${ICONS[doc.cat]}</div>
+            ${doc.isNew ? '<span class="doc-new-tag">Novo</span>' : ''}
+          </div>
+          <div class="doc-name">${doc.nome}</div>
+          <div class="doc-meta">
+            <span>${cfg.label}</span>
+            <span>${doc.arquivo}</span>
+          </div>
+        </div>
+        <div class="doc-footer">
+          <button class="btn-open" onclick="openModal(${doc.id}); event.stopPropagation()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Abrir
+          </button>
+          <button class="btn-dl" title="Baixar" onclick="triggerDownload(${doc.id}); event.stopPropagation()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+        </div>
+      `;
+                grid.insertBefore(card, empty);
+            });
+        }
+
+        /* ══════════════════════════════════
+           FILTER
+        ══════════════════════════════════ */
+        function filterCat(cat) {
+            currentCat = cat;
+            document.querySelectorAll('.cat-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+            renderCards();
+        }
+
+        function updateBadges() {
+            const cats = Object.keys(CAT_CONFIG);
+            document.getElementById('badge-todos').textContent = docs.length;
+            cats.forEach(cat => {
+                const el = document.getElementById('badge-' + cat);
+                if (el) el.textContent = docs.filter(d => d.cat === cat).length;
+            });
+        }
+
+        /* ══════════════════════════════════
+           MODAL
+        ══════════════════════════════════ */
+        function openModal(id) {
+            activeDoc = docs.find(d => d.id === id);
+            if (!activeDoc) return;
+            const cfg = CAT_CONFIG[activeDoc.cat];
+
+            // Header
+            document.getElementById('modalHero').style.background =
+                `linear-gradient(135deg, ${cfg.color} 0%, color-mix(in srgb, ${cfg.color} 75%, #000) 100%)`;
+            document.getElementById('modalIcon').style.background = 'rgba(255,255,255,0.12)';
+            document.getElementById('modalIcon').style.color = '#fff';
+            document.getElementById('modalIcon').innerHTML = ICONS[activeDoc.cat];
+            document.getElementById('modalName').textContent = activeDoc.nome;
+            document.getElementById('modalCat').textContent = cfg.label;
+            document.getElementById('modalPreviewName').textContent = activeDoc.arquivo;
+
+            document.getElementById('overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').classList.remove('open');
+            document.body.style.overflow = '';
+            activeDoc = null;
+        }
+
+        function handleOverlay(e) {
+            if (e.target === document.getElementById('overlay')) closeModal();
+        }
+
+        function openFile() {
+            if (!activeDoc) return;
+            showToast('Abrindo ' + activeDoc.arquivo + '…');
+            // Em produção: window.open(activeDoc.url, '_blank')
+        }
+
+        function downloadFile() {
+            if (!activeDoc) return;
+            triggerDownload(activeDoc.id);
+            closeModal();
+        }
+
+        function triggerDownload(id) {
+            const doc = docs.find(d => d.id === id);
+            if (!doc) return;
+            showToast('Baixando ' + doc.arquivo + '…');
+            // Em produção: link.href = doc.url; link.download = doc.arquivo; link.click()
+        }
+
+        /* ══════════════════════════════════
+           PROGRESS RING ANIMATION
+        ══════════════════════════════════ */
+        function animateRing() {
+            const total = 8;
+            const avail = docs.length;
+            const pct = avail / total;
+            const circ = 2 * Math.PI * 34; // r=34
+            const offset = circ * (1 - pct);
+            const ring = document.getElementById('progressRing');
+            if (ring) {
+                ring.style.strokeDasharray = circ;
+                ring.style.strokeDashoffset = circ; // start at 0%
+                setTimeout(() => { ring.style.strokeDashoffset = offset; }, 120);
+            }
+            document.getElementById('progressNum').textContent = avail;
+        }
+
+        /* ══════════════════════════════════
+           TOAST
+        ══════════════════════════════════ */
+        let toastTimer;
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+        }
+
+        /* ══════════════════════════════════
+           KEYBOARD
+        ══════════════════════════════════ */
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+        /* ══════════════════════════════════
+           INIT
+        ══════════════════════════════════ */
+        updateBadges();
+        renderCards();
+        animateRing();
+    </script>
+</body>
+
+</html>

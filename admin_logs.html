@@ -1237,7 +1237,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="admin_docs.html">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -1249,7 +1249,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
+                    <a href="admin_link.html">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -1259,7 +1259,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="travelwallet-logs.html" class="active">
+                    <a href="admin_logs.html" class="active">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
@@ -1277,8 +1277,8 @@
             <div class="page-header">
                 <div>
                     <h1 class="page-title">Logs</h1>
-                    <!-- Registrar os logs com base na aba de LOGS na planilha -->
-                    <p class="page-subtitle" id="headerSubtitle">-</p>
+                    <!-- Consumir o registro com base nos dados da planilha -->
+                    <p class="page-subtitle" id="headerSubtitle">-- registros do sistema</p>
                 </div>
                 <div class="page-actions">
                     <button class="btn-secondary" onclick="resetFilters()">
@@ -1314,7 +1314,7 @@
                         </svg>
                     </div>
                     <div class="summary-label">Total de Logs</div>
-                    <div class="summary-value" id="metricTotal">0</div>
+                    <div class="summary-value" id="metricTotal">--</div>
                 </div>
 
                 <div class="summary-card info">
@@ -1327,7 +1327,7 @@
                         </svg>
                     </div>
                     <div class="summary-label">Eventos Hoje</div>
-                    <div class="summary-value" id="metricToday">0</div>
+                    <div class="summary-value" id="metricToday">--</div>
                 </div>
 
                 <div class="summary-card warning">
@@ -1340,7 +1340,7 @@
                         </svg>
                     </div>
                     <div class="summary-label">Alertas</div>
-                    <div class="summary-value" id="metricWarnings">0</div>
+                    <div class="summary-value" id="metricWarnings">--</div>
                 </div>
 
                 <div class="summary-card danger">
@@ -1353,7 +1353,7 @@
                         </svg>
                     </div>
                     <div class="summary-label">Erros</div>
-                    <div class="summary-value" id="metricErrors">0</div>
+                    <div class="summary-value" id="metricErrors">--</div>
                 </div>
             </div>
 
@@ -1401,8 +1401,9 @@
             <div class="table-card">
                 <div class="table-card-header">
                     <h2 class="table-card-title">Logs registrados</h2>
-                    <!-- Registrar os logs com base na aba de LOGS na planilha -->
-                    <span class="badge badge-blue" id="tableBadge">#</span>
+
+                    <!-- Consumir o registro com base nos dados da planilha -->
+                    <span class="badge badge-blue" id="tableBadge">-- registros</span>
                 </div>
 
                 <div class="table-wrap">
@@ -1411,8 +1412,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th class="sortable sorted" data-col="timestamp" onclick="sortBy('timestamp')">Data/Hora
-                                    <i class="sort-icon">↓</i>
-                                </th>
+                                    <i class="sort-icon">↓</i></th>
                                 <th class="sortable" data-col="nivel" onclick="sortBy('nivel')">Nível <i
                                         class="sort-icon">↕</i></th>
                                 <th class="sortable" data-col="modulo" onclick="sortBy('modulo')">Módulo <i
@@ -1535,6 +1535,485 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        /* ══════════════════════════════════
+           DADOS MOCK
+        ══════════════════════════════════ */
+        const REFERENCE_DATE = '2026-06-22T23:59:59';
+
+        const logs = [
+            {
+                id: 'LOG-20260622-0036',
+                timestamp: '2026-06-22T17:08:49',
+                nivel: 'Info',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Worker',
+                acao: 'Rotina de sincronização concluída',
+                descricao: 'Processo automático validou clientes, links e documentos sem divergências críticas.',
+                ip: '—',
+                origem: 'worker-sync',
+                payload: { job: 'sync-daily', atualizados: 35, ignorados: 2, duracao_ms: 1834 }
+            },
+            {
+                id: 'LOG-20260622-0035',
+                timestamp: '2026-06-22T16:54:12',
+                nivel: 'Sucesso',
+                modulo: 'Links',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Link personalizado copiado',
+                descricao: 'Link do cliente João Silva foi copiado para compartilhamento externo.',
+                ip: '189.40.112.18',
+                origem: 'dashboard-links',
+                payload: { cliente_id: 1, cliente: 'João Silva', link: 'https://tw.joy/joao-silva' }
+            },
+            {
+                id: 'LOG-20260622-0034',
+                timestamp: '2026-06-22T16:41:03',
+                nivel: 'Alerta',
+                modulo: 'Documentos',
+                usuario: 'Sistema',
+                papel: 'Validador',
+                acao: 'Documento pendente de assinatura',
+                descricao: 'Documento de autorização de menor está pendente há mais de 72 horas.',
+                ip: '—',
+                origem: 'document-validator',
+                payload: { documento_id: 'DOC-1088', cliente: 'Isabela Martins', pendente_horas: 74 }
+            },
+            {
+                id: 'LOG-20260622-0033',
+                timestamp: '2026-06-22T16:22:55',
+                nivel: 'Sucesso',
+                modulo: 'Clientes',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Cliente atualizado',
+                descricao: 'Status de Pedro Souza alterado para Pendente após revisão financeira.',
+                ip: '189.40.112.18',
+                origem: 'clientes-modal',
+                payload: { cliente_id: 3, campo: 'status', anterior: 'Ativo', novo: 'Pendente' }
+            },
+            {
+                id: 'LOG-20260622-0032',
+                timestamp: '2026-06-22T15:47:31',
+                nivel: 'Erro',
+                modulo: 'Links',
+                usuario: 'Sistema',
+                papel: 'API',
+                acao: 'Falha ao gerar link',
+                descricao: 'Tentativa de gerar link duplicado para slug já existente.',
+                ip: '—',
+                origem: 'link-service',
+                payload: { slug: 'joao-silva', codigo: 'DUPLICATE_SLUG', tentativa: 2 }
+            },
+            {
+                id: 'LOG-20260622-0031',
+                timestamp: '2026-06-22T15:28:07',
+                nivel: 'Info',
+                modulo: 'Autenticação',
+                usuario: 'Rafael Lima',
+                papel: 'Operador',
+                acao: 'Login realizado',
+                descricao: 'Usuário acessou o painel administrativo com sucesso.',
+                ip: '201.62.88.44',
+                origem: 'auth-login',
+                payload: { metodo: 'password', dispositivo: 'Chrome / macOS', mfa: false }
+            },
+            {
+                id: 'LOG-20260622-0030',
+                timestamp: '2026-06-22T14:32:18',
+                nivel: 'Sucesso',
+                modulo: 'Links',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Link enviado por e-mail',
+                descricao: 'Link personalizado do cliente João Silva foi enviado com sucesso.',
+                ip: '189.40.112.18',
+                origem: 'link-share',
+                payload: { cliente_id: 1, canal: 'email', destinatario: 'joao.silva@email.com' }
+            },
+            {
+                id: 'LOG-20260622-0029',
+                timestamp: '2026-06-22T13:56:42',
+                nivel: 'Alerta',
+                modulo: 'Autenticação',
+                usuario: 'Sistema',
+                papel: 'Segurança',
+                acao: 'Tentativas de login consecutivas',
+                descricao: 'Três tentativas de login falharam para o mesmo e-mail em menos de 10 minutos.',
+                ip: '177.92.31.77',
+                origem: 'auth-guard',
+                payload: { email: 'operador@traveljoy.com', tentativas: 3, bloqueado: false }
+            },
+            {
+                id: 'LOG-20260622-0028',
+                timestamp: '2026-06-22T12:18:09',
+                nivel: 'Sucesso',
+                modulo: 'Documentos',
+                usuario: 'Camila Reis',
+                papel: 'Operador',
+                acao: 'Documento anexado',
+                descricao: 'Comprovante de seguro viagem anexado ao cadastro de Rafael Torres.',
+                ip: '200.219.14.202',
+                origem: 'document-upload',
+                payload: { cliente_id: 7, documento: 'seguro_viagem.pdf', tamanho_kb: 482 }
+            },
+            {
+                id: 'LOG-20260622-0027',
+                timestamp: '2026-06-22T11:44:26',
+                nivel: 'Info',
+                modulo: 'Clientes',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Consulta de detalhes do cliente',
+                descricao: 'Ficha de Carlos Pereira visualizada pelo modal de detalhes.',
+                ip: '189.40.112.18',
+                origem: 'clientes-table',
+                payload: { cliente_id: 5, aba: 'Informações' }
+            },
+            {
+                id: 'LOG-20260622-0026',
+                timestamp: '2026-06-22T10:31:14',
+                nivel: 'Sucesso',
+                modulo: 'Configurações',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Preferência de notificação alterada',
+                descricao: 'Notificações de pendências por e-mail foram ativadas.',
+                ip: '189.40.112.18',
+                origem: 'settings-notifications',
+                payload: { notificacao: 'pendencias_email', valor: true }
+            },
+            {
+                id: 'LOG-20260622-0025',
+                timestamp: '2026-06-22T09:12:58',
+                nivel: 'Erro',
+                modulo: 'Documentos',
+                usuario: 'Sistema',
+                papel: 'OCR',
+                acao: 'Falha na leitura de documento',
+                descricao: 'Não foi possível extrair dados do passaporte enviado por baixa qualidade da imagem.',
+                ip: '—',
+                origem: 'document-ocr',
+                payload: { documento_id: 'DOC-1079', codigo: 'LOW_QUALITY_IMAGE', cliente: 'Lucas Almeida' }
+            },
+            {
+                id: 'LOG-20260621-0024',
+                timestamp: '2026-06-21T18:42:03',
+                nivel: 'Sucesso',
+                modulo: 'Clientes',
+                usuario: 'Camila Reis',
+                papel: 'Operador',
+                acao: 'Novo cliente cadastrado',
+                descricao: 'Cadastro de Isabela Martins criado e vinculado ao evento ITB Berlin 2026.',
+                ip: '200.219.14.202',
+                origem: 'clientes-create',
+                payload: { cliente_id: 12, destino: 'ITB Berlin 2026', status: 'Pendente' }
+            },
+            {
+                id: 'LOG-20260621-0023',
+                timestamp: '2026-06-21T17:10:40',
+                nivel: 'Info',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Scheduler',
+                acao: 'Backup diário iniciado',
+                descricao: 'Backup incremental iniciado automaticamente.',
+                ip: '—',
+                origem: 'backup-scheduler',
+                payload: { tipo: 'incremental', storage: 's3-travelwallet-backups' }
+            },
+            {
+                id: 'LOG-20260621-0022',
+                timestamp: '2026-06-21T17:11:58',
+                nivel: 'Sucesso',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Scheduler',
+                acao: 'Backup diário concluído',
+                descricao: 'Backup incremental finalizado e validado.',
+                ip: '—',
+                origem: 'backup-scheduler',
+                payload: { tipo: 'incremental', arquivos: 142, tamanho_mb: 86.4 }
+            },
+            {
+                id: 'LOG-20260620-0021',
+                timestamp: '2026-06-20T16:33:21',
+                nivel: 'Alerta',
+                modulo: 'Links',
+                usuario: 'Sistema',
+                papel: 'Monitor',
+                acao: 'Link sem acesso recente',
+                descricao: 'Link de Fernanda Rocha não recebe acessos há mais de 30 dias.',
+                ip: '—',
+                origem: 'link-monitor',
+                payload: { cliente_id: 8, dias_sem_acesso: 33, status_cliente: 'Inativo' }
+            },
+            {
+                id: 'LOG-20260620-0020',
+                timestamp: '2026-06-20T15:03:11',
+                nivel: 'Sucesso',
+                modulo: 'Clientes',
+                usuario: 'Rafael Lima',
+                papel: 'Operador',
+                acao: 'Observação interna adicionada',
+                descricao: 'Nova observação registrada no cadastro de Camila Nunes.',
+                ip: '201.62.88.44',
+                origem: 'clientes-notes',
+                payload: { cliente_id: 10, campo: 'obs', caracteres: 48 }
+            },
+            {
+                id: 'LOG-20260619-0019',
+                timestamp: '2026-06-19T12:22:47',
+                nivel: 'Info',
+                modulo: 'Autenticação',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Logout realizado',
+                descricao: 'Sessão administrativa encerrada pelo usuário.',
+                ip: '189.40.112.18',
+                origem: 'auth-logout',
+                payload: { sessao_minutos: 112 }
+            },
+            {
+                id: 'LOG-20260618-0018',
+                timestamp: '2026-06-18T16:00:00',
+                nivel: 'Alerta',
+                modulo: 'Clientes',
+                usuario: 'Sistema',
+                papel: 'Financeiro',
+                acao: 'Segundo aviso de pagamento enviado',
+                descricao: 'Pedro Souza recebeu novo aviso de pendência financeira.',
+                ip: '—',
+                origem: 'billing-reminder',
+                payload: { cliente_id: 3, aviso: 2, canal: 'email' }
+            },
+            {
+                id: 'LOG-20260617-0017',
+                timestamp: '2026-06-17T09:58:33',
+                nivel: 'Sucesso',
+                modulo: 'Documentos',
+                usuario: 'Camila Reis',
+                papel: 'Operador',
+                acao: 'Documento aprovado',
+                descricao: 'Passaporte de Diego Carvalho aprovado após conferência.',
+                ip: '200.219.14.202',
+                origem: 'document-review',
+                payload: { cliente_id: 11, documento: 'passaporte', aprovado: true }
+            },
+            {
+                id: 'LOG-20260616-0016',
+                timestamp: '2026-06-16T11:20:19',
+                nivel: 'Info',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Monitor',
+                acao: 'Uso de armazenamento verificado',
+                descricao: 'Consumo de armazenamento está dentro dos limites configurados.',
+                ip: '—',
+                origem: 'storage-monitor',
+                payload: { usado_gb: 18.7, limite_gb: 100 }
+            },
+            {
+                id: 'LOG-20260615-0015',
+                timestamp: '2026-06-15T10:45:04',
+                nivel: 'Erro',
+                modulo: 'Autenticação',
+                usuario: 'Sistema',
+                papel: 'Segurança',
+                acao: 'Token expirado recusado',
+                descricao: 'Requisição com token expirado foi bloqueada pela API.',
+                ip: '181.223.19.88',
+                origem: 'api-auth',
+                payload: { endpoint: '/api/clientes/7', codigo: 'TOKEN_EXPIRED' }
+            },
+            {
+                id: 'LOG-20260614-0014',
+                timestamp: '2026-06-14T14:29:46',
+                nivel: 'Sucesso',
+                modulo: 'Links',
+                usuario: 'Rafael Lima',
+                papel: 'Operador',
+                acao: 'Novo link gerado',
+                descricao: 'Link personalizado criado para Diego Carvalho.',
+                ip: '201.62.88.44',
+                origem: 'link-create',
+                payload: { cliente_id: 11, slug: 'diego-carvalho' }
+            },
+            {
+                id: 'LOG-20260613-0013',
+                timestamp: '2026-06-13T15:50:23',
+                nivel: 'Info',
+                modulo: 'Clientes',
+                usuario: 'Camila Reis',
+                papel: 'Operador',
+                acao: 'Busca realizada na tabela',
+                descricao: 'Filtro por destino aplicado na aba Clientes.',
+                ip: '200.219.14.202',
+                origem: 'clientes-filter',
+                payload: { filtro: 'destino', valor: 'ITB Berlin 2026', resultados: 2 }
+            },
+            {
+                id: 'LOG-20260612-0012',
+                timestamp: '2026-06-12T08:15:01',
+                nivel: 'Alerta',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Monitor',
+                acao: 'Tempo de resposta elevado',
+                descricao: 'API de documentos respondeu acima do limite esperado por três chamadas consecutivas.',
+                ip: '—',
+                origem: 'api-monitor',
+                payload: { servico: 'documents-api', media_ms: 1840, limite_ms: 1200 }
+            },
+            {
+                id: 'LOG-20260610-0011',
+                timestamp: '2026-06-10T09:30:00',
+                nivel: 'Alerta',
+                modulo: 'Clientes',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Status alterado para Pendente',
+                descricao: 'Cliente Pedro Souza marcado como pendente.',
+                ip: '189.40.112.18',
+                origem: 'clientes-modal',
+                payload: { cliente_id: 3, status: 'Pendente' }
+            },
+            {
+                id: 'LOG-20260608-0010',
+                timestamp: '2026-06-08T19:05:32',
+                nivel: 'Sucesso',
+                modulo: 'Documentos',
+                usuario: 'Rafael Lima',
+                papel: 'Operador',
+                acao: 'Documento substituído',
+                descricao: 'Voucher de hotel de Ana Lima atualizado para a versão final.',
+                ip: '201.62.88.44',
+                origem: 'document-replace',
+                payload: { cliente_id: 4, documento: 'voucher_hotel.pdf', versao: 2 }
+            },
+            {
+                id: 'LOG-20260607-0009',
+                timestamp: '2026-06-07T13:18:55',
+                nivel: 'Info',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Release',
+                acao: 'Versão do painel registrada',
+                descricao: 'Build frontend publicado em ambiente de homologação.',
+                ip: '—',
+                origem: 'deploy',
+                payload: { versao: '1.4.2', ambiente: 'homologacao' }
+            },
+            {
+                id: 'LOG-20260605-0008',
+                timestamp: '2026-06-05T09:21:14',
+                nivel: 'Erro',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Integração',
+                acao: 'Webhook externo indisponível',
+                descricao: 'Falha temporária ao notificar integração de concierge.',
+                ip: '—',
+                origem: 'webhook-dispatcher',
+                payload: { servico: 'concierge-webhook', status_http: 503, retentativa: true }
+            },
+            {
+                id: 'LOG-20260603-0007',
+                timestamp: '2026-06-03T17:35:44',
+                nivel: 'Sucesso',
+                modulo: 'Configurações',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Perfil de acesso atualizado',
+                descricao: 'Permissões de operador ajustadas para visualização de documentos.',
+                ip: '189.40.112.18',
+                origem: 'settings-roles',
+                payload: { perfil: 'Operador', permissao: 'documentos.visualizar', valor: true }
+            },
+            {
+                id: 'LOG-20260601-0006',
+                timestamp: '2026-06-01T11:08:12',
+                nivel: 'Info',
+                modulo: 'Clientes',
+                usuario: 'Camila Reis',
+                papel: 'Operador',
+                acao: 'Exportação de clientes solicitada',
+                descricao: 'Relatório CSV com base filtrada de clientes foi gerado.',
+                ip: '200.219.14.202',
+                origem: 'clientes-export',
+                payload: { formato: 'csv', registros: 12 }
+            },
+            {
+                id: 'LOG-20260528-0005',
+                timestamp: '2026-05-28T10:11:05',
+                nivel: 'Sucesso',
+                modulo: 'Links',
+                usuario: 'Mariana Alves',
+                papel: 'Admin',
+                acao: 'Link reativado',
+                descricao: 'Link de Fernanda Rocha reativado para remarcação futura.',
+                ip: '189.40.112.18',
+                origem: 'link-status',
+                payload: { cliente_id: 8, status: 'ativo' }
+            },
+            {
+                id: 'LOG-20260522-0004',
+                timestamp: '2026-05-22T16:44:20',
+                nivel: 'Alerta',
+                modulo: 'Documentos',
+                usuario: 'Sistema',
+                papel: 'Validador',
+                acao: 'Documento próximo do vencimento',
+                descricao: 'Passaporte de cliente vence em menos de 6 meses.',
+                ip: '—',
+                origem: 'document-expiration',
+                payload: { cliente_id: 6, documento: 'passaporte', dias_para_vencer: 171 }
+            },
+            {
+                id: 'LOG-20260515-0003',
+                timestamp: '2026-05-15T08:34:39',
+                nivel: 'Info',
+                modulo: 'Autenticação',
+                usuario: 'Sistema',
+                papel: 'Segurança',
+                acao: 'Política de senha verificada',
+                descricao: 'Nenhum usuário fora dos critérios mínimos de senha.',
+                ip: '—',
+                origem: 'security-audit',
+                payload: { usuarios_verificados: 6, inconsistencias: 0 }
+            },
+            {
+                id: 'LOG-20260501-0002',
+                timestamp: '2026-05-01T12:13:10',
+                nivel: 'Sucesso',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Migração',
+                acao: 'Importação inicial concluída',
+                descricao: 'Clientes base importados para o protótipo TravelWallet.',
+                ip: '—',
+                origem: 'data-import',
+                payload: { clientes: 12, destinos: 7, erros: 0 }
+            },
+            {
+                id: 'LOG-20260422-0001',
+                timestamp: '2026-04-22T09:00:00',
+                nivel: 'Info',
+                modulo: 'Sistema',
+                usuario: 'Sistema',
+                papel: 'Setup',
+                acao: 'Ambiente inicial configurado',
+                descricao: 'Configuração inicial do painel administrativo concluída.',
+                ip: '—',
+                origem: 'system-bootstrap',
+                payload: { ambiente: 'demo', versao: '1.0.0' }
+            }
+        ];
+
+        /* ══════════════════════════════════
+           ESTADO
+        ══════════════════════════════════ */
         let currentPage = 1;
         const PER_PAGE = 10;
         let sortCol = 'timestamp';
