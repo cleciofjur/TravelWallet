@@ -1,82 +1,221 @@
-// Arquivo responsável por toda comunicação com o Google Sheets.
-
 const DatabaseService = (() => {
 
-    // Variável que armazena a instância da planilha, evitando abrir diversas vezes durante a mesma execução.
     let spreadsheet = null;
 
-    // Cache das abas da planilha, evitando buscas repetidas.
     const sheetCache = {};
+    const headerCache = {};
+    const dataCache = {};
+    const columnIndexCache = {};
 
     function getDatabase() {
-
-        // Se a planilha já estiver carregada, retorna imediatamente.
-        if (spreadsheet) {
-            return spreadsheet;
-        }
-
-        // Abre a planilha utilizando o ID definido no arquivo Config.gs.
+        if (spreadsheet) return spreadsheet;
         spreadsheet = SpreadsheetApp.openById(CONFIG.DATABASE_TRAVELWALLET);
-
         return spreadsheet;
     }
-    
-    // Retorna uma aba da planilha.
+
     function getSheet(sheetName) {
-
         if (!sheetName) {
-            throw new Error(
-                "DatabaseService.getSheet(): Nome da aba não informado."
-            );
+            throw new Error("DatabaseService.getSheet(): Nome da aba não informado.");
         }
 
-        // Verifica se a aba já foi carregada anteriormente.
-        if (sheetCache[sheetName]) {
-            return sheetCache[sheetName];
-        }
+        if (sheetCache[sheetName]) return sheetCache[sheetName];
 
-        // Busca a aba na planilha.
         const sheet = getDatabase().getSheetByName(sheetName);
 
-        // Caso não exista, lança um erro.
         if (!sheet) {
-            throw new Error(
-                `A aba "${sheetName}" não existe.`
-            );
+            throw new Error(`A aba "${sheetName}" não existe.`);
         }
 
-        // Armazena a aba no cache para reutilização.
         sheetCache[sheetName] = sheet;
-
         return sheet;
     }
 
-    // Verifica se uma aba existe na planilha
     function validateSheet(sheetName) {
-
         try {
-
             getSheet(sheetName);
-
             return true;
-
-        } catch (error) {
-
-            Logger.log(error);
-
+        } catch (e) {
+            Logger.log(e);
             return false;
         }
     }
 
-    // Expõe apenas as funções públicas do serviço.
+    function normalizeHeaders(headers) {
+        return headers.map(h =>
+            String(h)
+                .trim()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^\w\s]/g, "")
+                .replace(/\s+/g, "_")
+                .toLowerCase()
+        );
+    }
+
+    function getHeaders(sheetName) {
+        if (!sheetName) {
+            throw new Error("DatabaseService.getHeaders(): nome da aba não informado.");
+        }
+
+        if (headerCache[sheetName]) return headerCache[sheetName];
+
+        const sheet = getSheet(sheetName);
+
+        const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+        const normalizedHeaders = normalizeHeaders(headers);
+
+        headerCache[sheetName] = normalizedHeaders;
+
+        return normalizedHeaders;
+    }
+
+    function getColumnIndexes(sheetName) {
+        if (columnIndexCache[sheetName]) return columnIndexCache[sheetName];
+
+        const headers = getHeaders(sheetName);
+
+        const indexes = {};
+
+        headers.forEach((h, i) => indexes[h] = i);
+
+        columnIndexCache[sheetName] = indexes;
+
+        return indexes;
+    }
+
+    function getRangeValues(sheetName) {
+        if (!sheetName) {
+            throw new Error("DatabaseService.getRangeValues(): nome da aba não informado.");
+        }
+
+        if (dataCache[sheetName]) return dataCache[sheetName];
+
+        const sheet = getSheet(sheetName);
+
+        if (sheet.getLastRow() <= 1) {
+            dataCache[sheetName] = [];
+            return [];
+        }
+
+        const values = sheet.getRange(
+            2,
+            1,
+            sheet.getLastRow() - 1,
+            sheet.getLastColumn()
+        ).getValues();
+
+        dataCache[sheetName] = values;
+
+        return values;
+    }
+
+    function rowToObject(headers, row) {
+        const obj = {};
+
+        headers.forEach((header, index) => {
+            obj[header] = row[index] !== undefined ? row[index] : "";
+        });
+
+        return obj;
+    }
+
+    function objectToRow(headers, obj) {
+        return headers.map(header =>
+            Object.prototype.hasOwnProperty.call(obj, header)
+                ? obj[header]
+                : ""
+        );
+    }
+
+    function getAll(sheetName) {
+        const headers = getHeaders(sheetName);
+        return getRangeValues(sheetName).map(r => rowToObject(headers, r));
+    }
+
+    function findFirst(sheetName, field, value) {
+
+        const headers = getHeaders(sheetName);
+        const indexes = getColumnIndexes(sheetName);
+        const columnIndex = indexes[field];
+
+        if (columnIndex === undefined) {
+            throw new Error(`Campo "${field}" inexistente.`);
+        }
+
+        for (const row of getRangeValues(sheetName)) {
+            if (row[columnIndex] === value) {
+                return rowToObject(headers, row);
+            }
+        }
+
+        return null;
+    }
+
+    function findAll(sheetName, field, value) {
+
+        const headers = getHeaders(sheetName);
+        const indexes = getColumnIndexes(sheetName);
+        const columnIndex = indexes[field];
+
+        if (columnIndex === undefined) {
+            throw new Error(`Campo "${field}" inexistente.`);
+        }
+
+        const result = [];
+
+        for (const row of getRangeValues(sheetName)) {
+            if (row[columnIndex] === value) {
+                result.push(rowToObject(headers, row));
+            }
+        }
+
+        return result;
+    }
+
+    function exists(sheetName, field, value) {
+        return findFirst(sheetName, field, value) !== null;
+    }
+
+    function count(sheetName, field = null, value = null) {
+
+        const values = getRangeValues(sheetName);
+
+        if (!field) return values.length;
+
+        const indexes = getColumnIndexes(sheetName);
+        const columnIndex = indexes[field];
+
+        if (columnIndex === undefined) {
+            throw new Error(`Campo "${field}" inexistente.`);
+        }
+
+        let total = 0;
+
+        for (const row of values) {
+            if (row[columnIndex] === value) {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
     return {
-
         getDatabase,
-
         getSheet,
-
-        validateSheet
-
+        validateSheet,
+        normalizeHeaders,
+        getHeaders,
+        getColumnIndexes,
+        getRangeValues,
+        rowToObject,
+        objectToRow,
+        getAll,
+        findFirst,
+        findAll,
+        exists,
+        count
     };
 
 })();
