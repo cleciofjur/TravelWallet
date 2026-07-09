@@ -133,7 +133,7 @@ const DatabaseService = (() => {
         });
         return obj;
     }
-    
+
     // Converte um objeto em um array representando uma linha da planilha para escrita.
     function objectToRow(headers, obj) {
         return headers.map(header =>
@@ -200,6 +200,20 @@ const DatabaseService = (() => {
         return findFirst(sheetName, idField, id);
     }
 
+    function findBy(sheetName, filters) {
+        const headers = getHeaders(sheetName);
+
+        const indexes = getColumnIndexes(sheetName);
+
+        return getRangeValues(sheetName).filter(row => {
+            return Object.keys(filters).every(field => {
+                const index = indexes[field];
+
+                return row[index] === filters[field];
+            });
+        }).map(row => rowToObject(headers, row));
+    }
+
     // Retorna todos os objetos onde a coluna "field" equivale a "value".
     function findAll(sheetName, field, value) {
         const headers = getHeaders(sheetName);
@@ -227,7 +241,7 @@ const DatabaseService = (() => {
     function existsById(sheetName, idField, id) {
         return exists(sheetName, idField, id);
     }
-    
+
     // Insere um novo registro de forma segura, gerenciando Locks e esvaziando o cache.
     function insert(sheetName, object) {
         const lock = LockService.getScriptLock();
@@ -327,6 +341,100 @@ const DatabaseService = (() => {
         }
     }
 
+    // Função que insere varios registros de uma única vez
+    function insertMany(sheetName, objects) {
+
+        if (!Array.isArray(objects) || objects.length === 0) {
+            return;
+        }
+
+        const lock = LockService.getScriptLock();
+        lock.waitLock(10000);
+
+        try {
+            const headers = getHeaders(sheetName);
+            const rows = objects.map(obj => objectToRow(headers, obj));
+            const sheet = getSheet(sheetName);
+            const startRow = sheet.getLastRow() + 1;
+
+            sheet.getRange(startRow, 1, rows.length, headers.length).setValues(rows);
+
+            clearCache(sheetName);
+        } finally {
+            lock.releaseLock();
+        }
+    }
+
+    // Atualiza vários registros
+    function updateMany(sheetName, keyField, records) {
+        records.forEach(record => {
+            update(
+                sheetName,
+                keyField,
+                record[keyField],
+                record
+            );
+        });
+    }
+
+    // Insere ou atualiza um registro
+    function upsert(sheetName, keyField, object) {
+
+        const keyValue = object[keyField];
+
+        if (exists(sheetName, keyField, keyValue)) {
+            update(
+                sheetName,
+                keyField,
+                keyValue,
+                object
+            );
+        } else {
+            insert(
+                sheetName,
+                object
+            );
+        }
+    }
+
+    function upsertMany(sheetName, keyField, objects) {
+        objects.forEach(obj => {
+            upsert(
+                sheetName,
+                keyField,
+                obj
+            );
+        });
+    }
+
+    // Retorna a linha da planilha
+    function getRowNumber(sheetName, field, value) {
+        const indexes = getColumnIndexes(sheetName);
+
+        const columnIndex = indexes[field];
+
+        const values = getRangeValues(sheetName);
+
+        for (let i = 0; i < values.length; i++) {
+            if (values[i][columnIndex] === value) {
+                return i + 2;
+            }
+        }
+
+        return -1;
+
+    }
+
+    function truncate(sheetName) {
+        const sheet = getSheet(sheetName);
+
+        if (sheet.getLastRow() > 1) {
+            sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).clearContent();
+        }
+
+        clearCache(sheetName);
+    }
+
     return {
         getDatabase,
         getSheet,
@@ -350,7 +458,14 @@ const DatabaseService = (() => {
         findById,
         existsById,
         list,
-        countAll
+        countAll,
+        insertMany,
+        updateMany,
+        upsert,
+        upsertMany,
+        findBy,
+        getRowNumber,
+        truncate
     };
 
 })();
