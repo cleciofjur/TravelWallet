@@ -181,7 +181,7 @@ function buildFileObject(file) {
 
         updated: file.getLastUpdated(),
 
-        owner: file.getOwner() ? file.getOwner().getEmial() : "",
+        owner: file.getOwner() ? file.getOwner().getEmail() : "",
 
         trashed: file.isTrashed()
 
