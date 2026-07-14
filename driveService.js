@@ -1,190 +1,538 @@
-// Tipos MIME utilizados pelo sistema
-const DRIVE_MIME = Object.freeze({
+//  Serviço responsável pela leitura e pelo controle dos documentos do TravelWallet
+//  armazenados no Google Drive.
 
-    // Identificador técnico usado pelo Google para sinalizar que um item esta em uma pasta no Drive
-    FOLDER: "application/vnd.google-apps.folder",
+const DriveService = (() => {
+    const DRIVE_MIME = Object.freeze({
+        FOLDER: "application/vnd.google-apps.folder",
+        PDF: MimeType.PDF,
+        DOCUMENT: MimeType.GOOGLE_DOCS,
+        SPREADSHEET: MimeType.GOOGLE_SHEETS,
+        PRESENTATION: MimeType.GOOGLE_SLIDES,
+        IMAGE_JPEG: MimeType.JPEG,
+        IMAGE_PNG: MimeType.PNG
+    });
 
-    // Representação dos arquivos no sistma é feito a associação ao código identificador da internet
-    PDF: MimeType.PDF,
+    const ACCEPTED_MIME_TYPES = Object.freeze([
+        DRIVE_MIME.PDF,
+        DRIVE_MIME.DOCUMENT,
+        DRIVE_MIME.SPREADSHEET,
+        DRIVE_MIME.PRESENTATION,
+        DRIVE_MIME.IMAGE_JPEG,
+        DRIVE_MIME.IMAGE_PNG
+    ]);
 
-    DOCUMENT: MimeType.GOOGLE_DOCS,
+    const DRIVE_PERMISSION = Object.freeze({
+        VIEW: DriveApp.Permission.VIEW,
+        EDIT: DriveApp.Permission.EDIT,
+        COMMENT: DriveApp.Permission.COMMENT,
+        NONE: DriveApp.Permission.NONE
+    });
 
-    SPREEDSHEAT: MimeType.GOOGLE_SHEETS,
+    const DRIVE_ACCESS = Object.freeze({
+        PRIVATE: DriveApp.Access.PRIVATE,
+        DOMAIN: DriveApp.Access.DOMAIN,
+        DOMAIN_WITH_LINK: DriveApp.Access.DOMAIN_WITH_LINK,
+        ANYONE: DriveApp.Access.ANYONE,
+        ANYONE_WITH_LINK: DriveApp.Access.ANYONE_WITH_LINK
+    });
 
-    PRESENTATION: MimeType.GOOGLE_SLIDES,
+    // -------------------- Helpers privados --------------------
 
-    IMAGE_JPEG: MimeType.JPEG,
+    function requireValue(value, methodName, fieldName) {
+        if (value === undefined || value === null || String(value).trim() === "") {
+            throw new Error(
+                `DriveService.${methodName}(): ${fieldName} não informado.`
+            );
+        }
 
-    IMAGE_PNG: MimeType.PNG
-
-});
-
-// Constantes de permissões ao Google Drive
-const DRIVE_PERMISSION = Object.freeze({
-
-    VIEW: DriveApp.Permission.VIEW,
-
-    EDIT: DriveApp.Permission.EDIT,
-
-    COMMENT: DriveApp.Permission.COMMENT
-
-});
-
-// Constantes de acesso ao Google Drive
-const DRIVE_ACCESS = Object({
-
-    PRIVATE: DriveApp.Access.PRIVATE,
-
-    DOMAIN: DriveApp.Access.DOMAIN,
-
-    ANYONE: DriveApp.Access.ANYONE,
-
-    ANYONE_WITH_LINK: DriveApp.Access.ANYONE_WITH_LINK,
-
-});
-
-// ------------ HELPERS PRIVADOS ------------
-
-// Retorna uma pasta pelo ID
-function getFolder(folderId) {
-    if (!folderId) {
-        throw new Error("DriveService.getFolder(): FolderId não informado.")
+        return String(value).trim();
     }
 
-    try {
-        return DriveApp.getFolder(folderId);
-    } catch (e) {
-        throw new Error(
-            "Pasta não encontrada: " + folderId
+    function sanitizeName(value) {
+        if (value === undefined || value === null) {
+            return "";
+        }
+
+        return String(value)
+            .trim()
+            .replace(/[\\/:*?"<>|]/g, "-")
+            .replace(/\s+/g, " ");
+    }
+
+    // Extrai ID e resource key de um ID puro ou de uma URL do Google Drive.
+    function parseDriveReference(value, methodName) {
+        const reference = requireValue(value, methodName, "ID ou URL");
+
+        if (/^[a-zA-Z0-9_-]{20,}$/.test(reference)) {
+            return { id: reference, resourceKey: "" };
+        }
+
+        const idPatterns = [
+            /\/folders\/([a-zA-Z0-9_-]{20,})/i,
+            /\/d\/([a-zA-Z0-9_-]{20,})/i,
+            /[?&]id=([a-zA-Z0-9_-]{20,})/i
+        ];
+
+        let id = "";
+
+        for (let index = 0; index < idPatterns.length; index++) {
+            const match = reference.match(idPatterns[index]);
+
+            if (match) {
+                id = match[1];
+                break;
+            }
+        }
+
+        if (!id) {
+            const fallback = reference.match(/[-\w]{20,}/);
+            id = fallback ? fallback[0] : "";
+        }
+
+        if (!id) {
+            throw new Error(
+                `DriveService.${methodName}(): ID do Google Drive inválido.`
+            );
+        }
+
+        const resourceKeyMatch = reference.match(/[?&]resourcekey=([^&#]+)/i);
+
+        return {
+            id,
+            resourceKey: resourceKeyMatch
+                ? decodeURIComponent(resourceKeyMatch[1])
+                : ""
+        };
+    }
+
+    function safeCall(callback, fallback = "") {
+        try {
+            const value = callback();
+            return value === undefined || value === null ? fallback : value;
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function serializeDate(value) {
+        if (!value) {
+            return "";
+        }
+
+        try {
+            return value.toISOString();
+        } catch (error) {
+            return String(value);
+        }
+    }
+
+    function enumName(value) {
+        return value === undefined || value === null ? "" : String(value);
+    }
+
+    function getOwnerEmail(item) {
+        return safeCall(() => {
+            const owner = item.getOwner();
+            return owner ? owner.getEmail() : "";
+        });
+    }
+
+    function getParentInfo(item) {
+        return safeCall(() => {
+            const parents = item.getParents();
+
+            if (!parents.hasNext()) {
+                return { id: "", name: "", url: "" };
+            }
+
+            const parent = parents.next();
+
+            return {
+                id: parent.getId(),
+                name: parent.getName(),
+                url: parent.getUrl()
+            };
+        }, { id: "", name: "", url: "" });
+    }
+
+    function isFileObject(value) {
+        return Boolean(
+            value
+            && typeof value.getId === "function"
+            && typeof value.getMimeType === "function"
         );
     }
-}
 
-// Retorna um arquivo pelo ID
-function getFile(fileId) {
-    if (!fileId) {
-        throw new Error("DriveService.getFile(): FileId não informado.");
-    }
-
-    try {
-        return DriveApp.getFileById(fileId);
-    } catch (e) {
-        throw new Error(
-            "Arquivo não encontrado: " + fileId
+    function isFolderObject(value) {
+        return Boolean(
+            value
+            && typeof value.getId === "function"
+            && typeof value.getFiles === "function"
         );
     }
-}
 
-// Verifica se uma pasta existe
-function folderExists(folderId) {
-    try {
-        DriveApp.getFolderById(folderId);
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
+    function resolveFile(fileReference, methodName) {
+        if (isFileObject(fileReference)) {
+            return fileReference;
+        }
 
-// Verifica se um arquivo existe
-function fileExists(fileId) {
-    try {
-        DriveApp.getFileById(fileId);
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
+        const reference = String(fileReference || "");
 
-// Remove caracteres inválidos
-function sanitizeName(value) {
-    if (!value) {
-        return "";
+        return /^https?:\/\//i.test(reference)
+            ? getFileByUrl(reference)
+            : getFileById(reference);
     }
 
-    return String(value)
-        .trim()
-        .replace(/[\\/:*?"<>|]/g, "-")
-        .replace(/\s+/g, " ");
-}
+    function resolveFolder(folderReference, methodName) {
+        if (isFolderObject(folderReference)) {
+            return folderReference;
+        }
 
-// Extrai o ID de uma URL dp Google Drive
-function parseDriveId(value) {
-    if (!value) {
-        return "";
+        const reference = String(folderReference || "");
+
+        return /^https?:\/\//i.test(reference)
+            ? getFolderByUrl(reference)
+            : getFolderById(reference);
     }
 
-    if (/^[a-zA-Z0-9_-]{20,}$/.test(value)) {
-        return value;
+    function isAcceptedMimeType(mimeType) {
+        return ACCEPTED_MIME_TYPES.indexOf(mimeType) !== -1;
     }
 
-    const match = String(value).match(/[-\w]{25,}/);
+    function normalizeListOptions(options) {
+        const source = options && typeof options === "object" ? options : {};
 
-    return match ? match[0] : "";
-}
-
-// Retrona o MimeType de um arquivo
-function getMimeType(file) {
-    if (!file) {
-        return "";
+        return {
+            recursive: source.recursive === true,
+            includeTrashed: source.includeTrashed === true,
+            acceptedOnly: source.acceptedOnly === true,
+            visibleOnly: source.visibleOnly === true,
+            mimeTypes: Array.isArray(source.mimeTypes) ? source.mimeTypes : [],
+            sortBy: source.sortBy || "name",
+            descending: source.descending === true
+        };
     }
 
-    return file.getMimeType();
-}
+    function fileMatchesOptions(file, options) {
+        const trashed = safeCall(() => file.isTrashed(), false);
+        const mimeType = safeCall(() => file.getMimeType());
 
-// Retorna a pasta pai
-function getParentFolder(folder) {
-    if (!folder) {
-        return null;
+        if (!options.includeTrashed && trashed) {
+            return false;
+        }
+
+        if (options.acceptedOnly && !isAcceptedMimeType(mimeType)) {
+            return false;
+        }
+
+        if (options.visibleOnly && !isVisible(file)) {
+            return false;
+        }
+
+        return !options.mimeTypes.length
+            || options.mimeTypes.indexOf(mimeType) !== -1;
     }
 
-    const parents = folder.getParents();
+    function collectFiles(folder, options, result) {
+        const files = folder.getFiles();
 
-    return parents.hasNext() ? parents.next() : null;
+        while (files.hasNext()) {
+            const file = files.next();
 
-}
+            if (fileMatchesOptions(file, options)) {
+                result.push(getFileInfo(file));
+            }
+        }
 
-// Converte Folder em objeto
-function buildFolderObject(folder) {
+        if (!options.recursive) {
+            return;
+        }
 
-    return {
+        const folders = folder.getFolders();
 
-        id: folder.getId(),
+        while (folders.hasNext()) {
+            const childFolder = folders.next();
 
-        name: folder.getName(),
+            if (options.includeTrashed || !safeCall(() => childFolder.isTrashed(), false)) {
+                collectFiles(childFolder, options, result);
+            }
+        }
+    }
 
-        url: folder.getUrl(),
+    function sortFiles(files, options) {
+        const allowedFields = ["name", "created", "updated", "size"];
+        const field = allowedFields.indexOf(options.sortBy) !== -1
+            ? options.sortBy
+            : "name";
+        const direction = options.descending ? -1 : 1;
 
-        created: folder.getDateCreated(),
+        return files.sort((left, right) => {
+            let a = left[field];
+            let b = right[field];
 
-        owner: folder.getOwner() ? folder.getOwner().getEmail() : "",
+            if (field === "name") {
+                a = String(a || "").toLocaleLowerCase();
+                b = String(b || "").toLocaleLowerCase();
+            }
 
-        trashed: folder.isTrashed()
-    };
-}
+            if (a === b) return 0;
+            return a > b ? direction : -direction;
+        });
+    }
 
-// Converte em File em objeto
-function buildFileObject(file) {
+    // -------------------- Pastas --------------------
 
-    return {
+    function getFolderById(folderId) {
+        const reference = parseDriveReference(folderId, "getFolderById");
 
-        id: file.getId(),
+        try {
+            return DriveApp.getFolderById(reference.id);
+        } catch (error) {
+            throw new Error(
+                `DriveService.getFolderById(): pasta não encontrada ou sem acesso (${reference.id}).`
+            );
+        }
+    }
 
-        name: file.getName(),
+    function getFolderByUrl(folderUrl) {
+        const reference = parseDriveReference(folderUrl, "getFolderByUrl");
 
-        url: file.getUrl(),
+        try {
+            if (
+                reference.resourceKey
+                && typeof DriveApp.getFolderByIdAndResourceKey === "function"
+            ) {
+                return DriveApp.getFolderByIdAndResourceKey(
+                    reference.id,
+                    reference.resourceKey
+                );
+            }
 
-        mimeType: file.geMimeType(),
+            return DriveApp.getFolderById(reference.id);
+        } catch (error) {
+            throw new Error(
+                `DriveService.getFolderByUrl(): pasta não encontrada ou sem acesso (${reference.id}).`
+            );
+        }
+    }
 
-        size: file.getSize(),
+    function getFolderInfo(folderReference) {
+        const folder = resolveFolder(folderReference, "getFolderInfo");
+        const parent = getParentInfo(folder);
 
-        created: file.getDateCreated(),
+        return {
+            id: folder.getId(),
+            name: folder.getName(),
+            safeName: sanitizeName(folder.getName()),
+            url: folder.getUrl(),
+            mimeType: DRIVE_MIME.FOLDER,
+            description: safeCall(() => folder.getDescription()),
+            created: serializeDate(safeCall(() => folder.getDateCreated(), null)),
+            updated: serializeDate(safeCall(() => folder.getLastUpdated(), null)),
+            owner: getOwnerEmail(folder),
+            parentId: parent.id,
+            parentName: parent.name,
+            parentUrl: parent.url,
+            sharingAccess: enumName(safeCall(() => folder.getSharingAccess())),
+            sharingPermission: enumName(safeCall(() => folder.getSharingPermission())),
+            trashed: safeCall(() => folder.isTrashed(), false)
+        };
+    }
 
-        updated: file.getLastUpdated(),
+    // -------------------- Arquivos --------------------
 
-        owner: file.getOwner() ? file.getOwner().getEmial() : "",
+    function getFileById(fileId) {
+        const reference = parseDriveReference(fileId, "getFileById");
 
-        trashed: file.isTrashed()
+        try {
+            return DriveApp.getFileById(reference.id);
+        } catch (error) {
+            throw new Error(
+                `DriveService.getFileById(): arquivo não encontrado ou sem acesso (${reference.id}).`
+            );
+        }
+    }
 
-    };
+    function getFileByUrl(fileUrl) {
+        const reference = parseDriveReference(fileUrl, "getFileByUrl");
 
-}
+        try {
+            if (
+                reference.resourceKey
+                && typeof DriveApp.getFileByIdAndResourceKey === "function"
+            ) {
+                return DriveApp.getFileByIdAndResourceKey(
+                    reference.id,
+                    reference.resourceKey
+                );
+            }
+
+            return DriveApp.getFileById(reference.id);
+        } catch (error) {
+            throw new Error(
+                `DriveService.getFileByUrl(): arquivo não encontrado ou sem acesso (${reference.id}).`
+            );
+        }
+    }
+
+    function getFileInfo(fileReference) {
+        const file = resolveFile(fileReference, "getFileInfo");
+        const parent = getParentInfo(file);
+        const mimeType = file.getMimeType();
+        const size = safeCall(() => file.getSize(), 0);
+
+        return {
+            id: file.getId(),
+            name: file.getName(),
+            safeName: sanitizeName(file.getName()),
+            url: file.getUrl(),
+            downloadUrl: safeCall(() => file.getDownloadUrl()),
+            mimeType,
+            size,
+            sizeBytes: size,
+            description: safeCall(() => file.getDescription()),
+            created: serializeDate(safeCall(() => file.getDateCreated(), null)),
+            updated: serializeDate(safeCall(() => file.getLastUpdated(), null)),
+            owner: getOwnerEmail(file),
+            parentId: parent.id,
+            parentName: parent.name,
+            parentUrl: parent.url,
+            sharingAccess: enumName(safeCall(() => file.getSharingAccess())),
+            sharingPermission: enumName(safeCall(() => file.getSharingPermission())),
+            accepted: isAcceptedMimeType(mimeType),
+            visible: isVisible(file),
+            trashed: safeCall(() => file.isTrashed(), false)
+        };
+    }
+
+    // -------------------- Listagem --------------------
+
+    // Lista os arquivos de uma pasta.
+    function listFiles(folderReference, options = {}) {
+        const folder = resolveFolder(folderReference, "listFiles");
+        const normalizedOptions = normalizeListOptions(options);
+        const result = [];
+
+        collectFiles(folder, normalizedOptions, result);
+
+        return sortFiles(result, normalizedOptions);
+    }
+
+    function listAcceptedFiles(folderReference, options = {}) {
+        return listFiles(folderReference, {
+            ...options,
+            acceptedOnly: true
+        });
+    }
+
+    function listVisibleFiles(folderReference, options = {}) {
+        return listFiles(folderReference, {
+            ...options,
+            visibleOnly: true
+        });
+    }
+
+    // -------------------- Controle de visibilidade --------------------
+
+    function archiveFile(fileReference) {
+        const file = resolveFile(fileReference, "archiveFile");
+
+        try {
+            file.setTrashed(true);
+            return getFileInfo(file);
+        } catch (error) {
+            throw new Error(
+                `DriveService.archiveFile(): não foi possível arquivar o arquivo (${file.getId()}). ${error.message}`
+            );
+        }
+    }
+
+    function restoreFile(fileReference) {
+        const file = resolveFile(fileReference, "restoreFile");
+
+        try {
+            file.setTrashed(false);
+            return getFileInfo(file);
+        } catch (error) {
+            throw new Error(
+                `DriveService.restoreFile(): não foi possível restaurar o arquivo (${file.getId()}). ${error.message}`
+            );
+        }
+    }
+
+    // Define se o arquivo pode ser acessado por qualquer pessoa que tenha o link.
+    function setVisibility(fileReference, visible) {
+        const file = resolveFile(fileReference, "setVisibility");
+
+        if (typeof visible !== "boolean") {
+            throw new Error(
+                "DriveService.setVisibility(): visible deve ser true ou false."
+            );
+        }
+
+        if (visible && safeCall(() => file.isTrashed(), false)) {
+            throw new Error(
+                "DriveService.setVisibility(): restaure o arquivo antes de torná-lo visível."
+            );
+        }
+
+        try {
+            if (visible) {
+                file.setSharing(
+                    DRIVE_ACCESS.ANYONE_WITH_LINK,
+                    DRIVE_PERMISSION.VIEW
+                );
+            } else {
+                file.setSharing(
+                    DRIVE_ACCESS.ANYONE,
+                    DRIVE_PERMISSION.NONE
+                );
+            }
+
+            return getFileInfo(file);
+        } catch (error) {
+            throw new Error(
+                `DriveService.setVisibility(): não foi possível alterar a visibilidade do arquivo (${file.getId()}). ${error.message}`
+            );
+        }
+    }
+
+    function isVisible(fileReference) {
+        const file = resolveFile(fileReference, "isVisible");
+
+        if (safeCall(() => file.isTrashed(), false)) {
+            return false;
+        }
+
+        const access = safeCall(() => file.getSharingAccess(), DRIVE_ACCESS.PRIVATE);
+        const permission = safeCall(
+            () => file.getSharingPermission(),
+            DRIVE_PERMISSION.NONE
+        );
+
+        return access !== DRIVE_ACCESS.PRIVATE
+            && permission !== DRIVE_PERMISSION.NONE;
+    }
+
+    // -------------------- Exportação --------------------
+
+    return Object.freeze({
+        MIME: DRIVE_MIME,
+        ACCEPTED_MIME_TYPES,
+        ACCESS: DRIVE_ACCESS,
+        PERMISSION: DRIVE_PERMISSION,
+        getFolderById,
+        getFolderByUrl,
+        getFolderInfo,
+        getFileById,
+        getFileByUrl,
+        getFileInfo,
+        listFiles,
+        listAcceptedFiles,
+        listVisibleFiles,
+        archiveFile,
+        restoreFile,
+        setVisibility,
+        isVisible
+    });
+})();
