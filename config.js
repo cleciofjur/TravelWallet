@@ -7,12 +7,12 @@ const CONFIG = {
     DATABASE_CRM: "",
 
     SHEETS: {
-        TOKENS      = "TOKENS",
-        ACESSOS     = "ACESSOS",
-        LOGS        = "LOGS",
-        CONFIG      = "CONFIG",
+        TOKENS: "TOKENS",
+        ACESSOS: "ACESSOS",
+        LOGS: "LOGS",
+        CONFIG: "CONFIG",
 
-        ORCAMENTOS  = "ORÇAMENTOS"
+        ORCAMENTOS: "ORÇAMENTOS"
     },
 
     // Define o tempo de vida útil de um token de acesso em dias
