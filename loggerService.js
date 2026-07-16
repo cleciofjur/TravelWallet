@@ -74,7 +74,7 @@ function sanitizePayload(payload) {
 // Obtém o usuário da execução
 function getUser() {
     try {
-        return Session.getActiveUser.getEmail() || "";
+        return Session.getActiveUser().getEmail() || "";
     } catch (e) {
         return "";
     }
@@ -120,10 +120,14 @@ function log(options = {}) {
 
         return logObject;
     } catch (error) {
-        Logger.log(
-            "[LoggerService] Falha ao registrar log: "
-            + error.message
-        );
+        try {
+            Logger.log(
+                "[LoggerService] Falha ao registrar log: "
+                + error.message
+            );
+        } catch (loggerError) {
+            // O logger nunca deve interromper a operação principal.
+        }
 
         return null;
 
@@ -177,7 +181,7 @@ function access(options = {}) {
     return info({
         ...options,
         module: options.module || "ClientService",
-        action: option.action || "ACCESS"
+        action: options.action || "ACCESS"
     });
 }
 
@@ -231,8 +235,8 @@ function exception(exception, options = {}) {
 }
 
 // Inicia um cronômetro
-function starTimer() {
-    return Date.now;
+function startTimer() {
+    return Date.now();
 }
 
 // Finaliza o cronômetro e registra automaticamente
@@ -248,3 +252,30 @@ function stopTimer(startTime, options = {}) {
 
     return executionTime;
 }
+
+// Interface pública usada pelos demais serviços.
+const LoggerService = Object.freeze({
+    LEVEL: LOG_LEVEL,
+    generateId,
+    serialize,
+    sanitizePayload,
+    getUser,
+    now,
+    createLogObject,
+    log,
+    info,
+    warning,
+    error,
+    debug,
+    security,
+    access,
+    webhook,
+    drive,
+    database,
+    performance,
+    exception,
+    startTimer,
+    // Mantém compatibilidade com chamadas que usavam o nome antigo.
+    starTimer: startTimer,
+    stopTimer
+});
